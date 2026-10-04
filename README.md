@@ -118,7 +118,7 @@ The container manager is LXD. This repository's installer creates the group and 
 
 `kane-civicmin` installer contract (accepted in both repositories; `kane-civicmin` BCP-0003): the node installer clones `kane-civicmin` at a release tag into `/opt/kane-civicmin/<tag>` inside the Portal container and runs `INSTALL/install.sh` there as root, with no arguments, after the group and the broker socket exist. Proven live with `kane-civicmin` at `dbcd2d9`; `kane-civicmin v0.5.0` is the first tag the node installer will pin (`v0.4.0`).
 
-Portal TLS contract (accepted; implemented in `v0.4.0`): enrollment in this repository generates the Portal key and certificate request and places the certificate in `/etc/civic-portal/tls/` (`private.key`, `request.csr`, `certificate.pem`, `chain.pem`, `fullchain.pem`), then calls `kane-civicmin`'s `INSTALL/configure-tls.sh` (root, no arguments) to point Usermin at it.
+Portal TLS contract (paths and ownership accepted; not yet implemented on either side; details pending the TLS / proxy / WireGuard design discussion before `v0.4.0`): enrollment in this repository generates the Portal key and certificate request and places the certificate in `/etc/civic-portal/tls/` (`private.key`, `request.csr`, `certificate.pem`, `chain.pem`, `fullchain.pem`), then will call `kane-civicmin`'s `INSTALL/configure-tls.sh` (root, no arguments; not yet written) to point Usermin at it.
 
 ## Authoritative records
 

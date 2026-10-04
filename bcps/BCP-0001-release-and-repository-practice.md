@@ -6,7 +6,7 @@ Status: Accepted
 Date: 2026-10-04  
 Supersedes: none  
 Superseded-by: none  
-Related: RFC-0001, kane-civicmin BCP-0001
+Related: RFC-0002, kane-civicmin BCP-0001
 
 ## Purpose
 

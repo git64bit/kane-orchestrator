@@ -2,10 +2,10 @@
 
 Number: RFC-0001  
 Title: Orchestrator Node Scope and Boundaries  
-Status: Accepted  
+Status: Superseded  
 Date: 2026-10-04  
 Supersedes: none  
-Superseded-by: none  
+Superseded-by: RFC-0002  
 Related: BCP-0001, kane-civicmin RFC-0001, git64bit/kane-capabilities
 
 ## Decision

@@ -116,12 +116,15 @@ protocol Custom Command broker protocol v2
 
 The container manager is LXD. This repository's installer creates the group and the socket, then runs the `kane-civicmin` installer at a pinned release tag inside the Portal container. That location and tag are the only reference this repository holds to `kane-civicmin`.
 
-Proposed `kane-civicmin` installer contract (to be agreed in both repositories): the node installer clones `kane-civicmin` at a release tag into `/opt/kane-civicmin/<tag>` inside the Portal container and runs `INSTALL/install.sh` there as root, with no arguments, after the group and the broker socket exist. Until `kane-civicmin` provides that entry point, the node installer skips it (`--civicmin-repo` / `--civicmin-ref` unset).
+`kane-civicmin` installer contract (accepted in both repositories; `kane-civicmin` BCP-0003): the node installer clones `kane-civicmin` at a release tag into `/opt/kane-civicmin/<tag>` inside the Portal container and runs `INSTALL/install.sh` there as root, with no arguments, after the group and the broker socket exist. Proven live with `kane-civicmin` at `dbcd2d9`; `kane-civicmin v0.5.0` is the first tag the node installer will pin (`v0.4.0`).
+
+Portal TLS contract (accepted; implemented in `v0.4.0`): enrollment in this repository generates the Portal key and certificate request and places the certificate in `/etc/civic-portal/tls/` (`private.key`, `request.csr`, `certificate.pem`, `chain.pem`, `fullchain.pem`), then calls `kane-civicmin`'s `INSTALL/configure-tls.sh` (root, no arguments) to point Usermin at it.
 
 ## Authoritative records
 
 - [RFC-0001 — Orchestrator Node Scope and Boundaries](rfcs/RFC-0001-orchestrator-node-scope-and-boundaries.md) (superseded by RFC-0002)
 - [RFC-0002 — Node Topology and Installation](rfcs/RFC-0002-node-topology-and-installation.md)
+- [RFC-0003 — Infrastructure, Not Service: Policy Boundary](rfcs/RFC-0003-infrastructure-not-service-policy-boundary.md) (draft)
 - [BCP-0001 — Release and Repository Practice](bcps/BCP-0001-release-and-repository-practice.md)
 - [BCP-0002 — Participant Onboarding](bcps/BCP-0002-participant-onboarding.md)
 - [BCP-0003 — Upstream Component Versions](bcps/BCP-0003-upstream-component-versions.md)
@@ -176,7 +179,6 @@ Recorded here until settled by an RFC. Raised to the Owner Operator only when bo
 - whether published content is retrievable from the IPFS network in `v1.0.0` (the frozen design keeps Kubo loopback-only with swarm disabled);
 - per-operator caps enforced by a shared publication host;
 - the broker's real (non-stub) `water-ants` result shape, and whether explicit Participant confirmation is carried to the Orchestrator and recorded as evidence;
-- the `kane-civicmin` installer entry point the node installer calls (proposal above).
 
 ## License
 

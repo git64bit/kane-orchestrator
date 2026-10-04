@@ -10,7 +10,7 @@ import re
 import stat
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 
 MAX_ARTIFACT_BYTES = 262_144
@@ -29,12 +29,6 @@ class ParticipantIdentity:
     uid: int
     username: str
     participant_id: str
-
-
-@dataclass(frozen=True)
-class PreparedPublication:
-    participant: ParticipantIdentity
-    artifact: dict[str, Any]
 
 
 class ParticipantRegistry:
@@ -203,57 +197,3 @@ def derive_artifact(payload: bytes) -> dict[str, Any]:
         "encoding": "base64",
         "content": base64.b64encode(payload).decode("ascii"),
     }
-
-
-Publisher = Callable[
-    [ParticipantIdentity, dict[str, Any]],
-    dict[str, Any],
-]
-
-
-class LocalPublicationAdapter:
-    """Bounded U-002 adapter. No caller/client identity is accepted from peers."""
-
-    def __init__(
-        self,
-        registry: ParticipantRegistry,
-        publisher: Publisher | None = None,
-    ) -> None:
-        self.registry = registry
-        self.publisher = publisher
-
-    def prepare(
-        self,
-        peer_uid: int,
-        payload: bytes,
-    ) -> PreparedPublication:
-        participant = self.registry.resolve(peer_uid)
-        artifact = derive_artifact(payload)
-        return PreparedPublication(
-            participant=participant,
-            artifact=artifact,
-        )
-
-    def handle(
-        self,
-        peer_uid: int,
-        payload: bytes,
-    ) -> dict[str, Any]:
-        prepared = self.prepare(peer_uid, payload)
-
-        if self.publisher is None:
-            return {
-                "status": "validated",
-                "remote_dispatch": False,
-                "participant_id": prepared.participant.participant_id,
-                "artifact": {
-                    "media_type": prepared.artifact["media_type"],
-                    "size_bytes": prepared.artifact["size_bytes"],
-                    "sha256": prepared.artifact["sha256"],
-                },
-            }
-
-        return self.publisher(
-            prepared.participant,
-            prepared.artifact,
-        )

@@ -9,7 +9,7 @@ from typing import Any
 import yaml
 from jsonschema import Draft202012Validator
 
-from .usermin_adapter import LocalAdapterError
+from .participants import LocalAdapterError
 
 
 class CustomCommandAccessError(LocalAdapterError):

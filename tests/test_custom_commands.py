@@ -13,7 +13,7 @@ from civic_orchestrator.custom_commands import (
     CustomCommandRegistry,
     LocalCustomCommandAdapter,
 )
-from civic_orchestrator.usermin_adapter import ParticipantIdentity
+from civic_orchestrator.participants import ParticipantIdentity
 
 
 ROOT = Path(__file__).resolve().parents[1]

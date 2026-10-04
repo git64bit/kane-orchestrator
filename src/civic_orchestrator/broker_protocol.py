@@ -1,6 +1,17 @@
+"""Custom Command broker protocol v2 over AF_UNIX.
+
+Frame (request):  !II  metadata_length, payload_length
+                  metadata  UTF-8 JSON object with exactly
+                            protocol_version, request_kind, codename, arguments
+                  payload   raw bytes
+Frame (response): !I   body_length, then a UTF-8 JSON object
+
+The peer's identity is never read from the frame. It is derived from the
+kernel with SO_PEERCRED.
+"""
+
 from __future__ import annotations
 
-import argparse
 import json
 import os
 import socket
@@ -12,18 +23,10 @@ from .custom_commands import (
     CustomCommandError,
     LocalCustomCommandAdapter,
 )
-from .usermin_adapter import (
-    LocalAdapterError,
-    LocalPublicationAdapter,
-    MAX_ARTIFACT_BYTES,
-    ParticipantRegistry,
-)
-from .usermin_remote import (
-    OrchestratorPublisher,
-    load_systemd_adapter_credential,
-)
+from .participants import LocalAdapterError, MAX_ARTIFACT_BYTES
 
 
+PROTOCOL_VERSION = 2
 _FRAME = struct.Struct("!I")
 _COMMAND_FRAME = struct.Struct("!II")
 MAX_COMMAND_METADATA_BYTES = 8_192
@@ -44,16 +47,6 @@ def recv_exact(conn: socket.socket, length: int) -> bytes:
         chunks.append(chunk)
         remaining -= len(chunk)
     return b"".join(chunks)
-
-
-def recv_payload(conn: socket.socket) -> bytes:
-    header = recv_exact(conn, _FRAME.size)
-    (length,) = _FRAME.unpack(header)
-    if length > MAX_ARTIFACT_BYTES:
-        raise BrokerProtocolError(
-            f"artifact exceeds {MAX_ARTIFACT_BYTES} byte publication limit"
-        )
-    return recv_exact(conn, length)
 
 
 def recv_command_invocation(conn: socket.socket) -> CommandInvocation:
@@ -84,7 +77,7 @@ def recv_command_invocation(conn: socket.socket) -> CommandInvocation:
         "arguments",
     }:
         raise BrokerProtocolError("Custom Command metadata fields are invalid")
-    if metadata["protocol_version"] != 2:
+    if metadata["protocol_version"] != PROTOCOL_VERSION:
         raise BrokerProtocolError("unsupported Custom Command protocol version")
 
     request_kind = metadata["request_kind"]
@@ -148,30 +141,6 @@ def peer_credentials(conn: socket.socket) -> tuple[int, int, int]:
     return struct.unpack("3i", raw)
 
 
-def handle_connection(
-    conn: socket.socket,
-    adapter: LocalPublicationAdapter,
-) -> None:
-    try:
-        _pid, uid, _gid = peer_credentials(conn)
-        payload = recv_payload(conn)
-        response = adapter.handle(uid, payload)
-    except (BrokerProtocolError, LocalAdapterError) as exc:
-        response = {
-            "status": "rejected",
-            "remote_dispatch": False,
-            "error": str(exc)[:500],
-        }
-    except Exception:
-        response = {
-            "status": "rejected",
-            "remote_dispatch": False,
-            "error": "internal local broker error",
-        }
-
-    send_json(conn, response)
-
-
 def handle_command_connection(
     conn: socket.socket,
     adapter: LocalCustomCommandAdapter,
@@ -198,16 +167,6 @@ def handle_command_connection(
     send_json(conn, response)
 
 
-def serve(
-    listener: socket.socket,
-    adapter: LocalPublicationAdapter,
-) -> None:
-    while True:
-        conn, _ = listener.accept()
-        with conn:
-            handle_connection(conn, adapter)
-
-
 def systemd_listener() -> socket.socket:
     try:
         listen_pid = int(os.environ.get("LISTEN_PID", "0"))
@@ -221,64 +180,3 @@ def systemd_listener() -> socket.socket:
         )
 
     return socket.fromfd(3, socket.AF_UNIX, socket.SOCK_STREAM)
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--participant-registry",
-        required=True,
-    )
-    parser.add_argument(
-        "--participant-group",
-        default="civic-participants",
-    )
-    parser.add_argument(
-        "--orchestrator-base-url",
-        help=(
-            "Civic Orchestrator base URL. When omitted, the broker remains "
-            "validation-only and performs no remote dispatch."
-        ),
-    )
-    parser.add_argument(
-        "--adapter-credential-name",
-        help=(
-            "systemd credential name for authenticated Orchestrator ingress; "
-            "required only with --orchestrator-base-url"
-        ),
-    )
-    args = parser.parse_args()
-
-    if bool(args.orchestrator_base_url) != bool(args.adapter_credential_name):
-        parser.error(
-            "--orchestrator-base-url and --adapter-credential-name "
-            "must be configured together"
-        )
-
-    registry = ParticipantRegistry(
-        args.participant_registry,
-        participant_group=args.participant_group,
-    )
-
-    publisher = None
-    if args.orchestrator_base_url:
-        credential = load_systemd_adapter_credential(
-            args.adapter_credential_name
-        )
-        publisher = OrchestratorPublisher(
-            args.orchestrator_base_url,
-            credential,
-        )
-
-    adapter = LocalPublicationAdapter(
-        registry,
-        publisher=publisher,
-    )
-
-    listener = systemd_listener()
-    with listener:
-        serve(listener, adapter)
-
-
-if __name__ == "__main__":
-    main()

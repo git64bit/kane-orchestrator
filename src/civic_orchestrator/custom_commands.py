@@ -10,7 +10,7 @@ import yaml
 from jsonschema import Draft202012Validator
 
 from .custom_command_access import CustomCommandAccessPolicy
-from .usermin_adapter import (
+from .participants import (
     LocalAdapterError,
     ParticipantIdentity,
     ParticipantRegistry,

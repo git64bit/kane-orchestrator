@@ -15,7 +15,7 @@ LoadCredential=publication-service.json:/etc/civic-orchestrator/credentials/publ
 ExecStart=/opt/civic-orchestrator/venv/bin/python -m civic_orchestrator.server \
   --repo-root /opt/civic-orchestrator/current \
   --state-db /var/lib/civic-orchestrator/state/orchestrator.sqlite3 \
-  --listen 127.0.0.1 \
+  --listen @ORCHESTRATOR_LISTEN@ \
   --port 8045 \
   --publication-base-url @PUBLICATION_BASE_URL@ \
   --publication-budget-policy /etc/civic-orchestrator/publication-budget-v1.json \

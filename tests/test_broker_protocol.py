@@ -5,28 +5,15 @@ import struct
 import threading
 import unittest
 
-from civic_orchestrator.usermin_adapter import MAX_ARTIFACT_BYTES
-from civic_orchestrator.usermin_broker import (
+from civic_orchestrator.broker_protocol import (
     handle_command_connection,
-    handle_connection,
     recv_exact,
 )
+from civic_orchestrator.participants import MAX_ARTIFACT_BYTES
 
 
 _FRAME = struct.Struct("!I")
-
-
-class RecordingAdapter:
-    def __init__(self):
-        self.calls = []
-
-    def handle(self, peer_uid, payload):
-        self.calls.append((peer_uid, payload))
-        return {
-            "status": "validated",
-            "remote_dispatch": False,
-            "size": len(payload),
-        }
+_COMMAND_FRAME = struct.Struct("!II")
 
 
 def receive_json(conn):
@@ -51,16 +38,15 @@ class RecordingCommandAdapter:
         }
 
 
-def command_frame(
+def command_metadata(
     codename="water-ants",
-    payload=b"",
     arguments=None,
     version=2,
     request_kind="invoke",
 ):
     if arguments is None:
         arguments = {}
-    metadata = json.dumps(
+    return json.dumps(
         {
             "protocol_version": version,
             "request_kind": request_kind,
@@ -70,25 +56,32 @@ def command_frame(
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
-    return struct.Struct("!II").pack(len(metadata), len(payload)) + metadata + payload
 
 
-class UserminBrokerTests(unittest.TestCase):
-    def exchange(self, frame_bytes, adapter=None):
-        if adapter is None:
-            adapter = RecordingAdapter()
-        server, client = socket.socketpair(
-            socket.AF_UNIX,
-            socket.SOCK_STREAM,
-        )
+def command_frame(
+    codename="water-ants",
+    payload=b"",
+    arguments=None,
+    version=2,
+    request_kind="invoke",
+):
+    metadata = command_metadata(codename, arguments, version, request_kind)
+    return _COMMAND_FRAME.pack(len(metadata), len(payload)) + metadata + payload
 
+
+class BrokerProtocolTests(unittest.TestCase):
+    def exchange(self, frame_bytes, *, shutdown=False):
+        adapter = RecordingCommandAdapter()
+        server, client = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM)
         thread = threading.Thread(
-            target=handle_connection,
+            target=handle_command_connection,
             args=(server, adapter),
         )
         thread.start()
         try:
             client.sendall(frame_bytes)
+            if shutdown:
+                client.shutdown(socket.SHUT_WR)
             result = receive_json(client)
         finally:
             client.close()
@@ -96,53 +89,43 @@ class UserminBrokerTests(unittest.TestCase):
             server.close()
         return result, adapter
 
-    def test_kernel_peer_uid_is_used_with_byte_payload(self):
+    def test_identity_comes_from_kernel_not_payload(self):
         payload = b'{"caller":{"subject":"operator:root"}}'
-        result, adapter = self.exchange(
-            _FRAME.pack(len(payload)) + payload
-        )
+        result, adapter = self.exchange(command_frame("water-ants", payload))
 
-        self.assertEqual(result["status"], "validated")
-        self.assertEqual(len(adapter.calls), 1)
-        peer_uid, observed_payload = adapter.calls[0]
+        self.assertEqual(result["status"], "stub")
+        peer_uid, invocation = adapter.calls[0]
         self.assertEqual(peer_uid, os.getuid())
-        self.assertEqual(observed_payload, payload)
+        self.assertEqual(invocation.payload, payload)
 
-    def test_oversize_frame_is_rejected_before_payload_read(self):
-        result, adapter = self.exchange(
-            _FRAME.pack(MAX_ARTIFACT_BYTES + 1)
-        )
+    def test_oversize_payload_is_rejected_before_payload_read(self):
+        metadata = command_metadata()
+        frame = _COMMAND_FRAME.pack(len(metadata), MAX_ARTIFACT_BYTES + 1)
+        result, adapter = self.exchange(frame + metadata)
 
         self.assertEqual(result["status"], "rejected")
         self.assertFalse(result["remote_dispatch"])
+        self.assertFalse(result["side_effects"])
         self.assertIn("exceeds", result["error"])
         self.assertEqual(adapter.calls, [])
 
-    def test_empty_file_is_valid_local_frame(self):
-        result, adapter = self.exchange(_FRAME.pack(0))
+    def test_exact_ceiling_payload_is_accepted(self):
+        payload = b"\0" * MAX_ARTIFACT_BYTES
+        result, adapter = self.exchange(command_frame("water-ants", payload))
 
-        self.assertEqual(result["status"], "validated")
-        self.assertEqual(adapter.calls[0][1], b"")
+        self.assertEqual(result["status"], "stub")
+        self.assertEqual(len(adapter.calls[0][1].payload), MAX_ARTIFACT_BYTES)
+
+    def test_empty_payload_is_a_valid_invocation(self):
+        result, adapter = self.exchange(command_frame("water-ants", b""))
+
+        self.assertEqual(result["status"], "stub")
+        self.assertEqual(adapter.calls[0][1].payload, b"")
 
     def test_truncated_payload_is_rejected(self):
-        server, client = socket.socketpair(
-            socket.AF_UNIX,
-            socket.SOCK_STREAM,
-        )
-        adapter = RecordingAdapter()
-        thread = threading.Thread(
-            target=handle_connection,
-            args=(server, adapter),
-        )
-        thread.start()
-        try:
-            client.sendall(_FRAME.pack(5) + b"abc")
-            client.shutdown(socket.SHUT_WR)
-            result = receive_json(client)
-        finally:
-            client.close()
-            thread.join(timeout=2)
-            server.close()
+        metadata = command_metadata()
+        frame = _COMMAND_FRAME.pack(len(metadata), 5) + metadata + b"abc"
+        result, adapter = self.exchange(frame, shutdown=True)
 
         self.assertEqual(result["status"], "rejected")
         self.assertIn("unexpected end", result["error"])

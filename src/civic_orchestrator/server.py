@@ -381,6 +381,22 @@ class Handler(BaseHTTPRequestHandler):
 
 
 
+_WILDCARD_LISTEN_ADDRESSES = frozenset({"", "0.0.0.0", "::", "[::]", "*"})
+
+
+def require_specific_listen_address(address: str) -> str:
+    """Refuse wildcard binds: the Orchestrator listens on one chosen address.
+
+    On a node this is the Orchestrator container's private bridge address
+    (RFC-0002); in development it is loopback.
+    """
+    if not isinstance(address, str) or address.strip() in _WILDCARD_LISTEN_ADDRESSES:
+        raise ValueError(
+            "the Orchestrator must listen on a specific address, not a wildcard"
+        )
+    return address
+
+
 def build_runtime(
     repo_root: Path,
     state_db: Path,
@@ -439,6 +455,10 @@ def main() -> None:
         ),
     )
     args = parser.parse_args()
+    try:
+        require_specific_listen_address(args.listen)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     publication_budget_policy = None
     if args.publication_budget_policy:

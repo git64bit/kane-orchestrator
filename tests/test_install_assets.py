@@ -25,9 +25,9 @@ class InstallAssetTests(unittest.TestCase):
                     f"{path.name} contains a literal address: {address}",
                 )
 
-    def test_orchestrator_listens_on_loopback_with_protected_credentials(self):
+    def test_orchestrator_listens_on_bridge_placeholder_with_protected_credentials(self):
         unit = self.read("civic-orchestrator.service")
-        self.assertIn("--listen 127.0.0.1", unit)
+        self.assertIn("--listen @ORCHESTRATOR_LISTEN@", unit)
         self.assertIn("--publication-base-url @PUBLICATION_BASE_URL@", unit)
         self.assertIn(
             "--publication-budget-policy "

@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class CustomCommandBrokerTests(unittest.TestCase):
     def test_repository_contracts_build_validation_only_adapter(self):
         with patch(
-            "civic_orchestrator.usermin_adapter.ParticipantRegistry._load_entries",
+            "civic_orchestrator.participants.ParticipantRegistry._load_entries",
             return_value=[],
         ):
             adapter = build_adapter(

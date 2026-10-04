@@ -29,23 +29,34 @@ The node consumes shared Civic Infrastructure services (DNS/DANE, certificate au
 
 ## Current state
 
-**Status:** `v0.1.0` — extraction baseline, pre-release
+**Status:** `v0.2.0` candidate — awaiting live acceptance on the reference node. `v0.1.0` (extraction baseline) is released.
 
-`v0.1.0` carries the accepted Orchestrator from the frozen `git64bit/kane-capabilities` repository into this repository **without behavior change**:
+### What works
 
-- contract-bearing runtime: request envelope validation, authorization decisions, workflow state machine, audit events, receipts, replay/idempotency, resumable external workflows, side-effect certainty;
+- contract-bearing Orchestrator runtime carried unchanged from `git64bit/kane-capabilities`: envelope validation, authorization decisions, workflow state machine, audit events, receipts, replay/idempotency, resumable external workflows, side-effect certainty;
 - `publication.publish`: exact-byte integrity, per-Participant publication budget, independent CID verification under the frozen single-raw-block profile (262,144-byte ceiling);
-- Custom Command broker: protocol v2 over AF_UNIX, `SO_PEERCRED` Participant resolution, curated default-deny access, `water-ants` / Publish File bound to `publication.publish` as a local stub;
+- Custom Command broker: protocol v2 over AF_UNIX, `SO_PEERCRED` Participant resolution, curated default-deny access, `water-ants` / Publish File bound to `publication.publish` as a **local stub**;
 - stub-first operation registry: every other Civic operation is registered and fails closed as `not-implemented` with no side effects;
 - publication service: validation-only; Kubo is not enabled.
 
-The suite runs 171 tests; CI covers Python 3.11, 3.12, and 3.13 on Ubuntu 24.04.
+### v0.2.0: Portal broker -> Orchestrator transport
 
-Removed during extraction: the earlier Usermin stock Custom Command helpers (`usermin_upload`, `usermin_command`), all Kane host/network/account deployment records, and the cross-host ingress relay. The legacy single-purpose publication broker code (`usermin_broker.main`, `LocalPublicationAdapter`) is still present without deployment units; `v0.2.0` consolidates it into the one Custom Command broker.
+`v0.2.0` builds and proves the authenticated transport across the private LXD bridge (RFC-0002) without changing anything Civicmin sees:
+
+- `civic_orchestrator.orchestrator_client` — the broker-side client. It submits only operations fixed in code, for a Participant resolved from `SO_PEERCRED`, with the broker's adapter credential; it refuses any subject outside the credential's namespace before dispatch.
+- `civic_orchestrator.transport_check` — run by the Owner Operator as root in the Portal container. It resolves a real Participant exactly as the broker does, submits one fixed side-effect-free stub operation (`participant.validate_publication`), reads the workflow evidence back, and verifies that the Participant identity and the adapter identity arrived unchanged.
+- `civic_orchestrator.credentials` — generates the shared adapter credential and the publication credential as owner-only files, never overwriting.
+- The Orchestrator refuses wildcard listen addresses; its unit template binds `@ORCHESTRATOR_LISTEN@`, the Orchestrator container's bridge address.
+- The legacy single-purpose publication broker is removed; modules are renamed to `participants`, `broker_protocol`, `orchestrator_client`.
+
+Unchanged by design, until `kane-civicmin` and this repository jointly define the real `water-ants` result and recorded-confirmation contract:
+
+- broker protocol v2 and its `list`, `help`, and `water-ants` stub responses (locked by `tests/test_civicmin_contract.py`);
+- `water-ants` remains `lifecycle: stub` in the registry; the broker service stays AF_UNIX-only and does not dispatch Participant commands to the Orchestrator.
+
+The suite runs 193 tests; CI covers Python 3.11, 3.12, and 3.13 on Ubuntu 24.04.
 
 No production node has been installed from this repository yet.
-
-The two-container topology in RFC-0002 was adopted after `v0.1.0`. The `v0.1.0` systemd templates still bind the Orchestrator to `127.0.0.1`; `v0.2.0` moves it to the private bridge address.
 
 ## Scope
 
@@ -68,7 +79,7 @@ group    civic-participants
 protocol Custom Command broker protocol v2
 ```
 
-This repository's installer creates the group and the socket, then runs the `kane-civicmin` installer at a pinned release tag inside the Portal container. That location and tag are the only reference this repository holds to `kane-civicmin`.
+The container manager is LXD. This repository's installer creates the group and the socket, then runs the `kane-civicmin` installer at a pinned release tag inside the Portal container. That location and tag are the only reference this repository holds to `kane-civicmin`.
 
 ## Authoritative records
 
@@ -126,7 +137,6 @@ Recorded here until settled by an RFC. Raised to the Owner Operator only when bo
 - per-operator caps enforced by a shared publication host;
 - the broker's real (non-stub) `water-ants` result shape, and whether explicit Participant confirmation is carried to the Orchestrator and recorded as evidence;
 - the Owner Operator command for Participant onboarding;
-- LXD or Incus as the container manager.
 
 ## License
 

@@ -8,10 +8,9 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from civic_orchestrator.usermin_adapter import (
+from civic_orchestrator.participants import (
     DEFAULT_MEDIA_TYPE,
     LocalAdapterError,
-    LocalPublicationAdapter,
     MAX_ARTIFACT_BYTES,
     ParticipantRegistry,
     derive_artifact,
@@ -51,15 +50,15 @@ class UserminAdapterTests(unittest.TestCase):
         group = SimpleNamespace(gr_gid=1004)
         return (
             patch(
-                "civic_orchestrator.usermin_adapter.pwd.getpwuid",
+                "civic_orchestrator.participants.pwd.getpwuid",
                 return_value=account,
             ),
             patch(
-                "civic_orchestrator.usermin_adapter.grp.getgrnam",
+                "civic_orchestrator.participants.grp.getgrnam",
                 return_value=group,
             ),
             patch(
-                "civic_orchestrator.usermin_adapter.os.getgrouplist",
+                "civic_orchestrator.participants.os.getgrouplist",
                 return_value=[1003, 1004],
             ),
         )
@@ -133,15 +132,15 @@ class UserminAdapterTests(unittest.TestCase):
         group = SimpleNamespace(gr_gid=1004)
         with (
             patch(
-                "civic_orchestrator.usermin_adapter.pwd.getpwuid",
+                "civic_orchestrator.participants.pwd.getpwuid",
                 return_value=account,
             ),
             patch(
-                "civic_orchestrator.usermin_adapter.grp.getgrnam",
+                "civic_orchestrator.participants.grp.getgrnam",
                 return_value=group,
             ),
             patch(
-                "civic_orchestrator.usermin_adapter.os.getgrouplist",
+                "civic_orchestrator.participants.os.getgrouplist",
                 return_value=[1003],
             ),
         ):
@@ -192,37 +191,6 @@ class UserminAdapterTests(unittest.TestCase):
                 "no unique active stable participant mapping",
             ):
                 self.registry().resolve(1002)
-
-    def test_validation_only_adapter_dispatches_nothing_remote(self):
-        self.write_registry(
-            [
-                {
-                    "username": "participant1",
-                    "uid": 1002,
-                    "participant_id": "participant:stable-a",
-                    "active": True,
-                }
-            ]
-        )
-        p1, p2, p3 = self.account_patches()
-        with p1, p2, p3:
-            result = LocalPublicationAdapter(
-                self.registry()
-            ).handle(1002, b"public bytes")
-
-        self.assertEqual(result["status"], "validated")
-        self.assertFalse(result["remote_dispatch"])
-        self.assertEqual(
-            result["participant_id"],
-            "participant:stable-a",
-        )
-        self.assertEqual(
-            result["artifact"]["sha256"],
-            hashlib.sha256(b"public bytes").hexdigest(),
-        )
-        self.assertNotIn("caller", result)
-        self.assertNotIn("client", result)
-        self.assertNotIn("path", result)
 
 
 if __name__ == "__main__":

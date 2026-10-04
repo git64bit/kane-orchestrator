@@ -9,8 +9,8 @@ from .custom_commands import (
     CustomCommandRegistry,
     LocalCustomCommandAdapter,
 )
-from .usermin_adapter import ParticipantRegistry
-from .usermin_broker import (
+from .participants import ParticipantRegistry
+from .broker_protocol import (
     handle_command_connection,
     systemd_listener,
 )

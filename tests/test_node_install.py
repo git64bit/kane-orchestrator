@@ -187,7 +187,8 @@ class InstallerTests(unittest.TestCase):
         base_p = host.index(LXC, "exec", "portal", "--", "bash", setup, "base")
         cred = host.index(LXC, "exec", "orchestrator", "--", ni.VENV_PY, "-m", "civic_orchestrator.credentials")
         orch = host.index(LXC, "exec", "orchestrator", "--", "bash", setup, "orchestrator", "10.77.0.20")
-        portal = host.index(LXC, "exec", "portal", "--", "bash", setup, "portal", "http://10.77.0.20:8045")
+        portal = host.index(LXC, "exec", "portal", "--", "bash", setup, "portal", "http://10.77.0.20:8045",
+                            "operator:root")
         self.assertLess(base_o, cred)
         self.assertLess(base_p, cred)
         self.assertLess(cred, orch)
@@ -278,7 +279,13 @@ class InstallerTests(unittest.TestCase):
         self.assertTrue(host.has(LXC, "exec", "orchestrator", "--", "bash", ni.SETUP,
                                  "orchestrator", "10.88.5.20"))
         self.assertTrue(host.has(LXC, "exec", "portal", "--", "bash", ni.SETUP,
-                                 "portal", "http://10.88.5.20:8045"))
+                                 "portal", "http://10.88.5.20:8045", "operator:root"))
+
+    def test_installing_operator_is_recorded_on_the_portal(self):
+        host = FakeHost()
+        self.installer(host, operator="operator:sandor").run()
+        self.assertTrue(host.has(LXC, "exec", "portal", "--", "bash", ni.SETUP,
+                                 "portal", "http://10.77.0.20:8045", "operator:sandor"))
 
     def test_loopback_listener_fails_verification(self):
         host = FakeHost(loopback_answers=True)

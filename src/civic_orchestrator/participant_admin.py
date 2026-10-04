@@ -402,15 +402,29 @@ class ParticipantAdmin:
         return rows
 
 
-def _default_operator() -> str:
-    name = os.environ.get("SUDO_USER") or os.environ.get("USER") or "root"
-    return f"operator:{name}"
+_OPERATOR_RE = re.compile(r"^operator:[A-Za-z0-9._@-]{1,64}$")
+
+
+def default_operator(environ: dict[str, str] | None = None) -> str:
+    """Who is recorded as granting or recording.
+
+    Order: a sudo user inside this container, then the node's recorded
+    Owner Operator (CIVIC_OPERATOR, written by the installer from the host
+    account that ran it), then the login name.
+    """
+    env = os.environ if environ is None else environ
+    if env.get("SUDO_USER"):
+        return f"operator:{env['SUDO_USER']}"
+    recorded = env.get("CIVIC_OPERATOR", "")
+    if _OPERATOR_RE.fullmatch(recorded):
+        return recorded
+    return f"operator:{env.get('USER') or 'root'}"
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="civic-participant", description=__doc__.split("\n\n")[0])
-    parser.add_argument("--operator", default=_default_operator(),
-                        help="recorded as granted_by / recorded_by (default: operator:<login>)")
+    parser.add_argument("--operator", default=default_operator(),
+                        help="recorded as granted_by / recorded_by (default: the node's Owner Operator)")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_add = sub.add_parser("add", help="register a Participant and mint a permanent identifier")
@@ -435,6 +449,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("list", help="show Participants and grants")
 
     args = parser.parse_args(argv)
+    if not _OPERATOR_RE.fullmatch(args.operator):
+        print("--operator must look like operator:<name>", file=sys.stderr)
+        return 2
     admin = ParticipantAdmin(operator=args.operator)
 
     if os.geteuid() != 0:

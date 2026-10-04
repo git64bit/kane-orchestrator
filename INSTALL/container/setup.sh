@@ -3,7 +3,8 @@
 #
 #   setup.sh base                       runtime: python venv, pinned dependencies
 #   setup.sh orchestrator <listen-ip>   Orchestrator service on its bridge address
-#   setup.sh portal <orchestrator-url>  broker, Participant files, operator commands
+#   setup.sh portal <orchestrator-url> <operator>
+#                                       broker, Participant files, operator commands
 #
 # Safe to re-run. Existing Participant registry and access policy are kept.
 set -euo pipefail
@@ -81,6 +82,8 @@ stage_orchestrator() {
 
 stage_portal() {
   local orchestrator_url="${1:?orchestrator URL required}"
+  local operator="${2:?operator name required}"
+  [[ "$operator" =~ ^operator:[A-Za-z0-9._@-]{1,64}$ ]] || die "invalid operator name: $operator"
 
   getent group civic-participants >/dev/null || groupadd --system civic-participants
   id civic-broker >/dev/null 2>&1 || \
@@ -111,7 +114,7 @@ PY
   chown root:civic-broker "$ETC/participants-v1.json" "$ETC/custom-command-access-v1.yaml"
   chmod 0640 "$ETC/participants-v1.json" "$ETC/custom-command-access-v1.yaml"
 
-  printf 'CIVIC_ORCHESTRATOR_BASE_URL=%s\n' "$orchestrator_url" > "$ETC/node.env"
+  printf 'CIVIC_ORCHESTRATOR_BASE_URL=%s\nCIVIC_OPERATOR=%s\n' "$orchestrator_url" "$operator" > "$ETC/node.env"
   chmod 0644 "$ETC/node.env"
 
   install -m 0644 "$SYSTEMD_SRC/civic-custom-command-broker.socket" /etc/systemd/system/
@@ -122,6 +125,8 @@ PY
 
   cat > /usr/local/sbin/civic-participant <<EOF
 #!/bin/sh
+. $ETC/node.env
+export CIVIC_OPERATOR
 exec $VENV/bin/python -m civic_orchestrator.participant_admin "\$@"
 EOF
   cat > /usr/local/sbin/civic-transport-check <<EOF

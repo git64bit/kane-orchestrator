@@ -17,6 +17,7 @@ import io
 import ipaddress
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -117,6 +118,7 @@ class NodeConfig:
     image: str = "ubuntu:24.04"
     civicmin_repo: str | None = None
     civicmin_ref: str | None = None
+    operator: str = "operator:root"
 
     @property
     def gateway(self) -> ipaddress.IPv4Address:
@@ -487,7 +489,7 @@ class Installer:
         self.credential()
         self.log("== Services")
         self.setup(ORCHESTRATOR, "orchestrator", str(cfg.orchestrator_ip))
-        self.setup(PORTAL, "portal", cfg.orchestrator_url)
+        self.setup(PORTAL, "portal", cfg.orchestrator_url, cfg.operator)
         self.civicmin()
         self.verify()
         self.summary(release)
@@ -496,13 +498,14 @@ class Installer:
         cfg = self.config
         self.log("")
         if self.runner.dry_run:
-            self.log("Dry run complete: the commands above were NOT run; nothing was changed.")
+            self.log("Dry run complete: none of the commands above were run; the node was not changed.")
             return
         self.log("Civic Infrastructure node installed.")
         self.log(f"  release        {release}")
         self.log(f"  bridge         {BRIDGE} {cfg.gateway}/{cfg.subnet.prefixlen}")
         self.log(f"  portal         {cfg.portal_ip}")
         self.log(f"  orchestrator   {cfg.orchestrator_url}")
+        self.log(f"  operator       {cfg.operator}")
         for note in self.notes:
             self.log(f"  note: {note}")
         self.log("")
@@ -525,6 +528,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--image", default="ubuntu:24.04")
     parser.add_argument("--civicmin-repo")
     parser.add_argument("--civicmin-ref")
+    parser.add_argument("--operator",
+                        help="Owner Operator recorded on grants (default: operator:<the sudo user>)")
     parser.add_argument("--dry-run", action="store_true",
                         help="inspect and print the changes without making them")
     args = parser.parse_args(argv)
@@ -535,6 +540,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"invalid --subnet: {exc}", file=sys.stderr)
         return 2
 
+    operator = args.operator or f"operator:{os.environ.get('SUDO_USER') or 'root'}"
+    if not re.fullmatch(r"operator:[A-Za-z0-9._@-]{1,64}", operator):
+        print(f"invalid --operator: {operator}", file=sys.stderr)
+        return 2
+
     config = NodeConfig(
         source=args.source.resolve(),
         subnet=subnet,
@@ -543,6 +553,7 @@ def main(argv: list[str] | None = None) -> int:
         image=args.image,
         civicmin_repo=args.civicmin_repo,
         civicmin_ref=args.civicmin_ref,
+        operator=operator,
     )
     installer = Installer(config, Runner(dry_run=args.dry_run))
     try:

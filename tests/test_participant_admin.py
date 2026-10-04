@@ -13,6 +13,7 @@ from civic_orchestrator.participant_admin import (
     AdminError,
     AdminPaths,
     ParticipantAdmin,
+    default_operator,
 )
 
 
@@ -201,6 +202,27 @@ class ParticipantAdminTests(unittest.TestCase):
         self.assertEqual(rows["alice"]["grants"], ["water-ants"])
         self.assertTrue(rows["alice"]["active"])
         self.assertFalse(rows["bob"]["active"])
+
+
+
+class DefaultOperatorTests(unittest.TestCase):
+    def test_recorded_node_operator_is_used_inside_lxc_exec(self):
+        self.assertEqual(
+            default_operator({"CIVIC_OPERATOR": "operator:sandor", "USER": "root"}),
+            "operator:sandor",
+        )
+
+    def test_sudo_user_inside_the_container_wins(self):
+        self.assertEqual(
+            default_operator({"SUDO_USER": "alice", "CIVIC_OPERATOR": "operator:sandor"}),
+            "operator:alice",
+        )
+
+    def test_malformed_recorded_operator_is_ignored(self):
+        self.assertEqual(
+            default_operator({"CIVIC_OPERATOR": "sandor; rm -rf /", "USER": "root"}),
+            "operator:root",
+        )
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 
 Number: RFC-0003  
 Title: Infrastructure, Not Service: Policy Boundary  
-Status: Draft  
+Status: Accepted  
 Date: 2026-10-04  
 Supersedes: none  
 Superseded-by: none  
@@ -35,11 +35,11 @@ The following are fixed. They do not limit what a Participant can do as a user; 
 
 - **Identity** is derived from the kernel (`SO_PEERCRED`) and mapped to a permanent, never-reused Participant identifier; it is never accepted from a Participant's input.
 - **Civic Custom Commands** are default-deny and granted per Participant with a recorded grantor, time, and reason (BCP-0002).
-- **Credentials** between Civic components are generated where used, held by root only, and never exposed to Participants.
+- **Credentials** between Civic components are generated or provisioned by the node installer, stored in protected root-only source files, and exposed only to the service that requires them through the accepted credential mechanism. They are never exposed to Participants.
 - **The Orchestrator** accepts operations only from an authenticated adapter, within that adapter's fixed identity namespace, and listens only where the installer places it.
 - **Evidence** — workflow state, authorization decisions, audit events, receipts, and publication records — is recorded by the Orchestrator and independently verifiable.
 
-A Participant with full shell access still cannot assert another Participant's identity, read a Civic credential, or alter Orchestrator evidence.
+A Participant with an ordinary unprivileged shell cannot, through the defined Civic interfaces, assert another Participant's identity, read a Civic credential, or alter Orchestrator evidence.
 
 ## Installer defaults
 
@@ -47,7 +47,7 @@ Installer defaults are mechanisms with conservative starting values, not policy:
 
 - the node installer publishes the Portal's Usermin only; it does not publish Webmin or any other administrative interface;
 - the Orchestrator is reachable only from the Portal container across the private bridge;
-- nothing else is opened.
+- the node installer does not publish any other Portal or administrative interface outside the node boundary.
 
 An Owner Operator may change any of these afterwards. Doing so is their policy decision and does not alter Civic authority integrity.
 

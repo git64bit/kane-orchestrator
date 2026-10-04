@@ -124,7 +124,7 @@ Portal TLS contract (accepted; implemented in `v0.4.0`): enrollment in this repo
 
 - [RFC-0001 — Orchestrator Node Scope and Boundaries](rfcs/RFC-0001-orchestrator-node-scope-and-boundaries.md) (superseded by RFC-0002)
 - [RFC-0002 — Node Topology and Installation](rfcs/RFC-0002-node-topology-and-installation.md)
-- [RFC-0003 — Infrastructure, Not Service: Policy Boundary](rfcs/RFC-0003-infrastructure-not-service-policy-boundary.md) (draft)
+- [RFC-0003 — Infrastructure, Not Service: Policy Boundary](rfcs/RFC-0003-infrastructure-not-service-policy-boundary.md)
 - [BCP-0001 — Release and Repository Practice](bcps/BCP-0001-release-and-repository-practice.md)
 - [BCP-0002 — Participant Onboarding](bcps/BCP-0002-participant-onboarding.md)
 - [BCP-0003 — Upstream Component Versions](bcps/BCP-0003-upstream-component-versions.md)

@@ -170,7 +170,7 @@ class InstallerTests(unittest.TestCase):
         host = FakeHost()
         self.installer(host).run()
 
-        self.assertTrue(host.has("snap", "install", "lxd", "--channel=5.21/stable"))
+        self.assertTrue(host.has("snap", "install", "lxd"))
         self.assertTrue(host.has("lvcreate", "-y", "-L", "272G", "-T", "ubuntu-vg/civic-thinpool"))
         self.assertTrue(host.has(LXC, "storage", "create", "civic", "lvm", "source=ubuntu-vg",
                                  "lvm.thinpool_name=civic-thinpool", "lvm.vg.force_reuse=true"))
@@ -349,7 +349,7 @@ class PreflightTests(unittest.TestCase):
             members = tar.getmembers()
         self.assertIn("INSTALL/container/setup.sh", names)
         self.assertIn("src/civic_orchestrator/server.py", names)
-        self.assertIn("INSTALL/requirements.lock", names)
+        self.assertIn("requirements.txt", names)
         self.assertFalse(any(n.startswith(".git/") or n == ".git" for n in names))
         self.assertFalse(any("__pycache__" in n for n in names))
         self.assertTrue(all(m.uid == 0 and m.gid == 0 for m in members))

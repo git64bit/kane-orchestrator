@@ -40,10 +40,10 @@ Add `-s -- --dry-run` after `bash` to see every change first without making any.
 The installer:
 
 1. checks the host (Ubuntu 24.04, root, bridge subnet free);
-2. installs LXD (5.21 LTS) and creates a `civic` storage pool: an LVM thin pool from free volume-group space when the root filesystem is on LVM, otherwise a directory pool;
+2. installs LXD (the snap's current stable channel) and creates a `civic` storage pool: an LVM thin pool from free volume-group space when the root filesystem is on LVM, otherwise a directory pool;
 3. creates the private bridge `civicbr0` and a `civic` profile, without touching any existing LXD configuration;
 4. creates the `orchestrator` (`.20`) and `portal` (`.10`) containers;
-5. installs this release in both, with hash-verified dependencies;
+5. installs this release in both, with its Python dependencies from their current releases;
 6. generates one adapter credential in the Orchestrator container and copies it to the Portal container without writing it to the host disk;
 7. starts the Orchestrator on its bridge address and the broker socket in the Portal container;
 8. verifies the Portal reaches the Orchestrator, the Orchestrator is not on loopback, and the broker answers.
@@ -124,6 +124,7 @@ Proposed `kane-civicmin` installer contract (to be agreed in both repositories):
 - [RFC-0002 — Node Topology and Installation](rfcs/RFC-0002-node-topology-and-installation.md)
 - [BCP-0001 — Release and Repository Practice](bcps/BCP-0001-release-and-repository-practice.md)
 - [BCP-0002 — Participant Onboarding](bcps/BCP-0002-participant-onboarding.md)
+- [BCP-0003 — Upstream Component Versions](bcps/BCP-0003-upstream-component-versions.md)
 
 ## Layout
 

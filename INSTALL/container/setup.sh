@@ -1,7 +1,7 @@
 #!/bin/bash
 # Runs inside a node container, as root, called by INSTALL/node_install.py.
 #
-#   setup.sh base                       runtime: python venv, pinned dependencies
+#   setup.sh base                       runtime: python venv, dependencies
 #   setup.sh orchestrator <listen-ip>   Orchestrator service on its bridge address
 #   setup.sh portal <orchestrator-url> <operator>
 #                                       broker, Participant files, operator commands
@@ -38,12 +38,12 @@ stage_base() {
   export DEBIAN_FRONTEND=noninteractive
   log "installing python3-venv"
   apt-get -o DPkg::Lock::Timeout=600 update -q >/dev/null
-  apt-get -o DPkg::Lock::Timeout=600 install -y -q python3-venv curl >/dev/null
+  apt-get -o DPkg::Lock::Timeout=600 install -y -q python3-venv curl git >/dev/null
 
   [ -x "$VENV/bin/python" ] || python3 -m venv "$VENV"
-  log "installing pinned dependencies (hash-verified)"
-  "$VENV/bin/pip" install -q --disable-pip-version-check --require-hashes \
-    -r "$CURRENT/INSTALL/requirements.lock"
+  log "installing dependencies"
+  "$VENV/bin/pip" install -q --disable-pip-version-check --upgrade \
+    -r "$CURRENT/requirements.txt"
 
   # Use the installed release in place: no build step, and switching
   # releases is a single symlink change.

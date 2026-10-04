@@ -30,7 +30,6 @@ from typing import Callable, Sequence
 
 LXC = "/snap/bin/lxc"
 LXD = "/snap/bin/lxd"
-LXD_CHANNEL = "5.21/stable"
 SUPPORTED_UBUNTU = {"24.04"}
 
 POOL = "civic"
@@ -271,7 +270,7 @@ class Installer:
         if self.runner.query(["snap", "list", "lxd"]).ok:
             self.log("   LXD already installed")
         else:
-            self.runner.change(["snap", "install", "lxd", f"--channel={LXD_CHANNEL}"])
+            self.runner.change(["snap", "install", "lxd"])
         self.runner.change([LXD, "waitready", "--timeout=300"])
 
     # -- storage

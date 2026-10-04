@@ -29,7 +29,7 @@ The node consumes shared Civic Infrastructure services (DNS/DANE, certificate au
 
 ## Current state
 
-**Status:** `v0.2.0` candidate — awaiting live acceptance on the reference node. `v0.1.0` (extraction baseline) is released.
+**Status:** `v0.2.0` — Portal broker -> Orchestrator transport, accepted on the reference node. `v0.1.0` (extraction baseline) is released.
 
 ### What works
 
@@ -55,6 +55,13 @@ Unchanged by design, until `kane-civicmin` and this repository jointly define th
 - `water-ants` remains `lifecycle: stub` in the registry; the broker service stays AF_UNIX-only and does not dispatch Participant commands to the Orchestrator.
 
 The suite runs 193 tests; CI covers Python 3.11, 3.12, and 3.13 on Ubuntu 24.04.
+
+Live acceptance on the reference node (Ubuntu 24.04 LTS host, LXD 5.21, two unprivileged Ubuntu 24.04 containers on a private bridge, Orchestrator bound to its bridge address only, one generated adapter credential installed in both containers):
+
+- `transport_check` for a provisioned Participant: all checks passed; the Participant identifier, adapter client identity, and adapter authentication arrived unchanged in the Orchestrator's workflow evidence, with no side effects;
+- an account outside `civic-participants` was refused in the Portal container before dispatch;
+- a forged adapter credential was refused by the Orchestrator with HTTP 401;
+- the Orchestrator was unreachable on loopback and reachable from the Portal container across the bridge.
 
 No production node has been installed from this repository yet.
 

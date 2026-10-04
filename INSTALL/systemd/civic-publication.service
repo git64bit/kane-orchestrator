@@ -1,5 +1,5 @@
-# Template for a publication host. The publication installer replaces every
-# @NAME@ placeholder. The service defaults to loopback; exposure beyond the
+# Template for a publication host. The publication installer fills in each
+# placeholder (an upper-case name between at-signs). The service defaults to loopback; exposure beyond the
 # host is a deliberate deployment decision.
 [Unit]
 Description=Civic Publication Service

@@ -27,41 +27,59 @@ Publication host: publication service + Kubo   (this repository)
 
 The node consumes shared Civic Infrastructure services (DNS/DANE, certificate authority, WireGuard hub, pass-through proxy, publication host) from a default provider or from the Owner Operator's own hosts.
 
+## Install a node
+
+On a freshly installed **Ubuntu Server 24.04 LTS** host with a wired connection, run one command:
+
+```text
+curl -fsSL https://raw.githubusercontent.com/git64bit/kane-orchestrator/v0.3.0/INSTALL/install.sh | sudo bash
+```
+
+Add `-s -- --dry-run` after `bash` to see every change first without making any. Other options: `--subnet` (private bridge, default `10.77.0.0/24`), `--storage auto|lvm|dir`, `--pool-size GIB`.
+
+The installer:
+
+1. checks the host (Ubuntu 24.04, root, bridge subnet free);
+2. installs LXD (5.21 LTS) and creates a `civic` storage pool: an LVM thin pool from free volume-group space when the root filesystem is on LVM, otherwise a directory pool;
+3. creates the private bridge `civicbr0` and a `civic` profile, without touching any existing LXD configuration;
+4. creates the `orchestrator` (`.20`) and `portal` (`.10`) containers;
+5. installs this release in both, with hash-verified dependencies;
+6. generates one adapter credential in the Orchestrator container and copies it to the Portal container without writing it to the host disk;
+7. starts the Orchestrator on its bridge address and the broker socket in the Portal container;
+8. verifies the Portal reaches the Orchestrator, the Orchestrator is not on loopback, and the broker answers.
+
+It is safe to re-run. Existing pieces are reused; anything that exists but does not match is reported and left unchanged. Participant records are never overwritten.
+
+A node needs no publication host. Publication settings arrive with the publication milestone.
+
+Then admit Participants (BCP-0002), from the host:
+
+```text
+sudo lxc exec portal -- civic-participant add <username> --create-account
+sudo lxc exec portal -- passwd <username>
+sudo lxc exec portal -- civic-participant grant <username> water-ants --reason "<evidence of voluntary participation>"
+sudo lxc exec portal -- civic-transport-check --participant <username>
+sudo lxc exec portal -- civic-participant list
+```
+
 ## Current state
 
-**Status:** `v0.2.0` — Portal broker -> Orchestrator transport, accepted on the reference node. `v0.1.0` (extraction baseline) is released.
+**Status:** `v0.3.0` candidate — one-command node installer and Participant onboarding; awaiting acceptance on a clean reference host. `v0.2.0` (Portal broker -> Orchestrator transport) is released.
 
 ### What works
 
 - contract-bearing Orchestrator runtime carried unchanged from `git64bit/kane-capabilities`: envelope validation, authorization decisions, workflow state machine, audit events, receipts, replay/idempotency, resumable external workflows, side-effect certainty;
 - `publication.publish`: exact-byte integrity, per-Participant publication budget, independent CID verification under the frozen single-raw-block profile (262,144-byte ceiling);
 - Custom Command broker: protocol v2 over AF_UNIX, `SO_PEERCRED` Participant resolution, curated default-deny access, `water-ants` / Publish File bound to `publication.publish` as a **local stub**;
+- authenticated Portal broker -> Orchestrator transport across the private bridge, proven by `civic-transport-check` (`v0.2.0`, accepted live);
+- `INSTALL/install.sh` and `INSTALL/node_install.py`: one-command, idempotent node installation (`v0.3.0`);
+- `civic-participant`: Participant onboarding with permanent identifiers, default-deny grants with recorded reasons, and retirement as tombstones (`v0.3.0`, BCP-0002);
 - stub-first operation registry: every other Civic operation is registered and fails closed as `not-implemented` with no side effects;
 - publication service: validation-only; Kubo is not enabled.
 
-### v0.2.0: Portal broker -> Orchestrator transport
+Unchanged by design, until `kane-civicmin` and this repository jointly define the real `water-ants` result and recorded-confirmation contract: broker protocol v2 and its `list`, `help`, and `water-ants` stub responses (locked by `tests/test_civicmin_contract.py`); `water-ants` remains `lifecycle: stub`; the broker service stays AF_UNIX-only.
 
-`v0.2.0` builds and proves the authenticated transport across the private LXD bridge (RFC-0002) without changing anything Civicmin sees:
-
-- `civic_orchestrator.orchestrator_client` — the broker-side client. It submits only operations fixed in code, for a Participant resolved from `SO_PEERCRED`, with the broker's adapter credential; it refuses any subject outside the credential's namespace before dispatch.
-- `civic_orchestrator.transport_check` — run by the Owner Operator as root in the Portal container. It resolves a real Participant exactly as the broker does, submits one fixed side-effect-free stub operation (`participant.validate_publication`), reads the workflow evidence back, and verifies that the Participant identity and the adapter identity arrived unchanged.
-- `civic_orchestrator.credentials` — generates the shared adapter credential and the publication credential as owner-only files, never overwriting.
-- The Orchestrator refuses wildcard listen addresses; its unit template binds `@ORCHESTRATOR_LISTEN@`, the Orchestrator container's bridge address.
-- The legacy single-purpose publication broker is removed; modules are renamed to `participants`, `broker_protocol`, `orchestrator_client`.
-
-Unchanged by design, until `kane-civicmin` and this repository jointly define the real `water-ants` result and recorded-confirmation contract:
-
-- broker protocol v2 and its `list`, `help`, and `water-ants` stub responses (locked by `tests/test_civicmin_contract.py`);
-- `water-ants` remains `lifecycle: stub` in the registry; the broker service stays AF_UNIX-only and does not dispatch Participant commands to the Orchestrator.
-
-The suite runs 193 tests; CI covers Python 3.11, 3.12, and 3.13 on Ubuntu 24.04.
-
-Live acceptance on the reference node (Ubuntu 24.04 LTS host, LXD 5.21, two unprivileged Ubuntu 24.04 containers on a private bridge, Orchestrator bound to its bridge address only, one generated adapter credential installed in both containers):
-
-- `transport_check` for a provisioned Participant: all checks passed; the Participant identifier, adapter client identity, and adapter authentication arrived unchanged in the Orchestrator's workflow evidence, with no side effects;
-- an account outside `civic-participants` was refused in the Portal container before dispatch;
-- a forged adapter credential was refused by the Orchestrator with HTTP 401;
-- the Orchestrator was unreachable on loopback and reachable from the Portal container across the bridge.
+The suite runs 223 tests; CI covers Python 3.11, 3.12, and 3.13 on Ubuntu 24.04. The installer's decisions (fresh host, re-run, mismatched bridge or container, storage fallback, credential copy) are tested with a simulated host.
 
 No production node has been installed from this repository yet.
 
@@ -72,7 +90,7 @@ This repository owns:
 - the Custom Command broker in the Portal container: Participant identity resolution (Unix account -> stable `participant:` identifier), default-deny command access, fixed command-to-operation binding;
 - the Civic Orchestrator in its own container: workflow, authorization, budget, audit, and evidence;
 - the publication service and its Kubo backend;
-- node installation (LXD, both containers, post-install enrollment) and publication-host installation.
+- node installation (LXD, both containers, Participant onboarding; enrollment in shared services next) and publication-host installation.
 
 It does **not** own the Participant interface (Usermin, Civicmin), which `kane-civicmin` installs, or the shared default infrastructure (DNS/DANE, certificate authority, WireGuard hub, proxy).
 
@@ -88,11 +106,14 @@ protocol Custom Command broker protocol v2
 
 The container manager is LXD. This repository's installer creates the group and the socket, then runs the `kane-civicmin` installer at a pinned release tag inside the Portal container. That location and tag are the only reference this repository holds to `kane-civicmin`.
 
+Proposed `kane-civicmin` installer contract (to be agreed in both repositories): the node installer clones `kane-civicmin` at a release tag into `/opt/kane-civicmin/<tag>` inside the Portal container and runs `INSTALL/install.sh` there as root, with no arguments, after the group and the broker socket exist. Until `kane-civicmin` provides that entry point, the node installer skips it (`--civicmin-repo` / `--civicmin-ref` unset).
+
 ## Authoritative records
 
 - [RFC-0001 — Orchestrator Node Scope and Boundaries](rfcs/RFC-0001-orchestrator-node-scope-and-boundaries.md) (superseded by RFC-0002)
 - [RFC-0002 — Node Topology and Installation](rfcs/RFC-0002-node-topology-and-installation.md)
 - [BCP-0001 — Release and Repository Practice](bcps/BCP-0001-release-and-repository-practice.md)
+- [BCP-0002 — Participant Onboarding](bcps/BCP-0002-participant-onboarding.md)
 
 ## Layout
 
@@ -126,10 +147,11 @@ Gate-driven Semantic Versioning (BCP-0001). Each tag is reviewed against the mat
 ```text
 v0.1.0  extraction baseline
 v0.2.0  broker -> Orchestrator link across the private LXD bridge
-v0.3.0  one-command node installer (LXD, both containers, post-install enrollment), Participant onboarding
-v0.4.0  Kubo publication backend and publication-host installer
-v0.5.0  per-operator publication credentials over WireGuard
-v0.6.0  reference deployment validation with kane-civicmin
+v0.3.0  one-command node installer (LXD, both containers), Participant onboarding
+v0.4.0  node enrollment: WireGuard, Portal certificate request and DANE TLSA, Civicmin installed by the node installer
+v0.5.0  Kubo publication backend and publication-host installer
+v0.6.0  per-operator publication credentials over WireGuard
+v0.7.0  reference deployment validation with kane-civicmin
 v0.9.0  independent Owner Operator release candidate
 v1.0.0  water-ants publishes end to end on an independently installed node
 ```
@@ -143,7 +165,7 @@ Recorded here until settled by an RFC. Raised to the Owner Operator only when bo
 - whether published content is retrievable from the IPFS network in `v1.0.0` (the frozen design keeps Kubo loopback-only with swarm disabled);
 - per-operator caps enforced by a shared publication host;
 - the broker's real (non-stub) `water-ants` result shape, and whether explicit Participant confirmation is carried to the Orchestrator and recorded as evidence;
-- the Owner Operator command for Participant onboarding;
+- the `kane-civicmin` installer entry point the node installer calls (proposal above).
 
 ## License
 

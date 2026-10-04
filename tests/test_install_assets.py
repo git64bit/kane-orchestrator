@@ -1,4 +1,6 @@
 import re
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -25,30 +27,48 @@ class InstallAssetTests(unittest.TestCase):
                     f"{path.name} contains a literal address: {address}",
                 )
 
-    def test_orchestrator_listens_on_bridge_placeholder_with_protected_credentials(self):
+    def test_orchestrator_unit_needs_no_publication_host(self):
         unit = self.read("civic-orchestrator.service")
         self.assertIn("--listen @ORCHESTRATOR_LISTEN@", unit)
-        self.assertIn("--publication-base-url @PUBLICATION_BASE_URL@", unit)
-        self.assertIn(
-            "--publication-budget-policy "
-            "/etc/civic-orchestrator/publication-budget-v1.json",
-            unit,
-        )
         self.assertIn(
             "LoadCredential=adapter.json:"
             "/etc/civic-orchestrator/credentials/adapter.json",
             unit,
         )
-        self.assertIn(
-            "LoadCredential=publication-service.json:"
-            "/etc/civic-orchestrator/credentials/publication-service.json",
-            unit,
-        )
         self.assertIn("--adapter-credential-name adapter.json", unit)
-        self.assertIn(
-            "--publication-credential-name publication-service.json",
-            unit,
-        )
+        service = unit.split("[Service]", 1)[1]
+        self.assertNotIn("publication", service)
+
+    def test_placeholders_are_known_and_never_in_comments(self):
+        allowed = {"ORCHESTRATOR_LISTEN", "PUBLICATION_LISTEN"}
+        for path in sorted(SYSTEMD.iterdir()):
+            for line in path.read_text(encoding="utf-8").splitlines():
+                found = set(re.findall(r"@([A-Z_]+)@", line))
+                if line.lstrip().startswith("#"):
+                    self.assertEqual(found, set(), f"{path.name}: placeholder text in a comment")
+                self.assertLessEqual(found, allowed, f"{path.name}: unknown placeholder")
+
+    def test_setup_render_fills_and_refuses_missing_values(self):
+        script = (ROOT / "INSTALL" / "container" / "setup.sh").read_text(encoding="utf-8")
+        functions = script[script.index("log() {"):script.index("stage_base() {")]
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "unit"
+            template = SYSTEMD / "civic-orchestrator.service"
+            ok = subprocess.run(
+                ["bash", "-c", functions + f'\nrender "{template}" "{out}" ORCHESTRATOR_LISTEN=10.77.0.20'],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(ok.returncode, 0, ok.stderr)
+            rendered = out.read_text(encoding="utf-8")
+            self.assertIn("--listen 10.77.0.20", rendered)
+            self.assertNotRegex(rendered, r"@[A-Z_]+@")
+
+            missing = subprocess.run(
+                ["bash", "-c", functions + f'\nrender "{template}" "{out}.2"'],
+                capture_output=True, text=True,
+            )
+            self.assertNotEqual(missing.returncode, 0)
+            self.assertFalse(Path(f"{out}.2").exists())
 
     def test_broker_socket_is_the_shared_civicmin_boundary(self):
         socket_unit = self.read("civic-custom-command-broker.socket")

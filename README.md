@@ -64,7 +64,7 @@ sudo lxc exec portal -- civic-participant list
 
 ## Current state
 
-**Status:** `v0.3.0` candidate — one-command node installer and Participant onboarding; awaiting acceptance on a clean reference host. `v0.2.0` (Portal broker -> Orchestrator transport) is released.
+**Status:** `v0.3.0` — one-command node installer and Participant onboarding, accepted on a clean reference host. `v0.2.0` (Portal broker -> Orchestrator transport) is released.
 
 ### What works
 
@@ -79,7 +79,17 @@ sudo lxc exec portal -- civic-participant list
 
 Unchanged by design, until `kane-civicmin` and this repository jointly define the real `water-ants` result and recorded-confirmation contract: broker protocol v2 and its `list`, `help`, and `water-ants` stub responses (locked by `tests/test_civicmin_contract.py`); `water-ants` remains `lifecycle: stub`; the broker service stays AF_UNIX-only.
 
-The suite runs 223 tests; CI covers Python 3.11, 3.12, and 3.13 on Ubuntu 24.04. The installer's decisions (fresh host, re-run, mismatched bridge or container, storage fallback, credential copy) are tested with a simulated host.
+The suite runs 227 tests; CI covers Python 3.11, 3.12, and 3.13 on Ubuntu 24.04. The installer's decisions (fresh host, re-run, mismatched bridge or container, storage fallback, credential copy) are tested with a simulated host.
+
+Live acceptance on the reference node (Ubuntu 24.04 LTS laptop, 2 cores, 4 GB RAM, LVM root, wired; prior LXD state removed so the host matched a fresh install):
+
+- the one-line command installed a working node unattended: 272 GiB LVM thin pool from free volume-group space, private bridge, both containers, release with hash-verified dependencies, credential generated and copied without host disk, services under full systemd hardening in unprivileged containers, verification passed;
+- `civic-participant add` minted a permanent identifier; `grant` recorded grantor, time, and reason; `civic-transport-check` passed for the new Participant;
+- as the Participant's own Unix account over the broker socket: `list` returned `water-ants` available; `water-ants` returned the protocol v2 stub with the correct SHA-256 and `remote_dispatch: false`;
+- re-running the installer created nothing, kept and verified the credential, and left Participants and grants unchanged;
+- re-running at a newer commit upgraded the node in place.
+
+One defect was found and fixed during acceptance: grants made through `sudo lxc exec` recorded `operator:root`; the installer now records the installing Owner Operator and `civic-participant` uses it.
 
 No production node has been installed from this repository yet.
 

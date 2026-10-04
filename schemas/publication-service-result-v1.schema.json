@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:publication-service-result:v1",
+  "title": "Publication Service Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "workflow_id",
+    "operation",
+    "sha256",
+    "size_bytes",
+    "cid",
+    "cid_profile",
+    "pinned",
+    "verified"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "workflow_id": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    },
+    "operation": {
+      "const": "publication.publish"
+    },
+    "sha256": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/sha256"
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 262144
+    },
+    "cid": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^b[a-z2-7]+$"
+    },
+    "pinned": {
+      "const": true
+    },
+    "verified": {
+      "const": true
+    },
+    "cid_profile": {
+      "const": "civic-ipfs-kubo-v1"
+    }
+  }
+}

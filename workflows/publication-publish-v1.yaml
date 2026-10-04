@@ -1,0 +1,21 @@
+workflow: publication-publish
+version: 1
+operation: publication.publish
+authorization_policy: publication-policy-v1
+authorization_reason: Bounded exact-artifact publication accepted for the configured publication service.
+service_capability: publication.publish
+
+steps:
+  - "validate: publication-publish-input-v1"
+  - "authorize: publication-policy-v1"
+  - "transition: accepted"
+  - "call: publication.publish"
+  - "verify: publication-service-result-v1"
+  - "record: publication-audit-receipt"
+  - "return: result-envelope-v1"
+
+constraints:
+  exact_artifact: true
+  arbitrary_command_execution: false
+  backend_network_calls: true
+  kubo_side_effects_enabled: false

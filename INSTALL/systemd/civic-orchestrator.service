@@ -1,0 +1,39 @@
+# Template. The node installer replaces every @NAME@ placeholder.
+[Unit]
+Description=Civic Orchestrator
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=civic-orchestrator
+Group=civic-orchestrator
+WorkingDirectory=/opt/civic-orchestrator/current
+Environment=PYTHONUNBUFFERED=1
+LoadCredential=adapter.json:/etc/civic-orchestrator/credentials/adapter.json
+LoadCredential=publication-service.json:/etc/civic-orchestrator/credentials/publication-service.json
+ExecStart=/opt/civic-orchestrator/venv/bin/python -m civic_orchestrator.server \
+  --repo-root /opt/civic-orchestrator/current \
+  --state-db /var/lib/civic-orchestrator/state/orchestrator.sqlite3 \
+  --listen 127.0.0.1 \
+  --port 8045 \
+  --publication-base-url @PUBLICATION_BASE_URL@ \
+  --publication-budget-policy /etc/civic-orchestrator/publication-budget-v1.json \
+  --publication-credential-name publication-service.json \
+  --adapter-credential-name adapter.json
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/civic-orchestrator
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:custom-command-help:v1",
+  "title": "Civic Custom Command Help Catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "catalog",
+    "help_system",
+    "commands"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "catalog": {
+      "const": "civic-custom-command-help"
+    },
+    "help_system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "style",
+        "local_rendering",
+        "authorization_effect",
+        "participant_goal"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "style": {
+          "const": "plain-language"
+        },
+        "local_rendering": {
+          "const": true
+        },
+        "authorization_effect": {
+          "const": "none"
+        },
+        "participant_goal": {
+          "const": "discovery-and-sanity-check"
+        }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codename",
+          "display_name",
+          "summary",
+          "use_when",
+          "before_run",
+          "significant_effects",
+          "consequences",
+          "incident_guidance",
+          "attention",
+          "confirmation"
+        ],
+        "properties": {
+          "codename": {
+            "type": "string",
+            "pattern": "^[a-z]{1,5}-[a-z]{1,5}$"
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "use_when": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "maxItems": 8
+          },
+          "before_run": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "maxItems": 12
+          },
+          "significant_effects": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "maxItems": 12
+          },
+          "consequences": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "maxItems": 12
+          },
+          "incident_guidance": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "maxItems": 12
+          },
+          "attention": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "caution",
+              "high"
+            ]
+          },
+          "confirmation": {
+            "type": "string",
+            "enum": [
+              "none",
+              "review",
+              "explicit"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

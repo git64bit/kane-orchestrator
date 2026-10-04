@@ -1,0 +1,34 @@
+[Unit]
+Description=Civic Custom Command Broker
+Requires=civic-custom-command-broker.socket
+After=local-fs.target
+
+[Service]
+Type=simple
+User=civic-broker
+Group=civic-broker
+ExecStart=/opt/civic-orchestrator/venv/bin/python -m civic_orchestrator.custom_command_broker \
+  --participant-registry /etc/civic-orchestrator/participants-v1.json \
+  --command-registry /etc/civic-orchestrator/custom-command-registry-v1.yaml \
+  --command-schema /etc/civic-orchestrator/custom-command-registry-v1.schema.json \
+  --help-catalog /etc/civic-orchestrator/custom-command-help-v1.yaml \
+  --help-schema /etc/civic-orchestrator/custom-command-help-v1.schema.json \
+  --access-policy /etc/civic-orchestrator/custom-command-access-v1.yaml \
+  --access-schema /etc/civic-orchestrator/custom-command-access-v1.schema.json
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_UNIX
+SystemCallArchitectures=native
+UMask=0077

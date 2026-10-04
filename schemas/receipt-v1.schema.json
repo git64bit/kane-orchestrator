@@ -1,0 +1,18 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"urn:civic-orchestrator:schema:receipt:v1",
+  "title":"Civic Operation Receipt v1",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["receipt_id","workflow_id","operation","issued_at","outcome","side_effects"],
+  "properties":{
+    "receipt_id":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/id"},
+    "workflow_id":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/id"},
+    "operation":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/operation"},
+    "issued_at":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/timestamp"},
+    "outcome":{"type":"string","enum":["completed","rejected","failed","not-implemented"]},
+    "side_effects":{"type":"boolean"},
+    "content_sha256":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/sha256"},
+    "evidence":{"type":"object"}
+  }
+}

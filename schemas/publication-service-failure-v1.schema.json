@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:publication-service-failure:v1",
+  "title": "Publication Service Failure v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "workflow_id",
+    "operation",
+    "failure_class",
+    "message",
+    "retryable"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "workflow_id": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    },
+    "operation": {
+      "const": "publication.publish"
+    },
+    "failure_class": {
+      "type": "string",
+      "enum": [
+        "invalid-request",
+        "integrity-mismatch",
+        "publication-failed",
+        "verification-failed",
+        "service-unavailable"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "retryable": {
+      "type": "boolean"
+    }
+  }
+}

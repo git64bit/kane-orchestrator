@@ -1,0 +1,110 @@
+contract_version: 1
+registry: civic-orchestrator-operations
+default_implementation: stub
+default_side_effects: false
+
+operations:
+  - operation: publication.publish
+    implementation: available
+    service_capability: publication.publish
+    effect_scope: external-bounded
+
+  - operation: geography.acquire_candidate
+    implementation: stub
+    service_capability: geography.acquire_candidate
+    effect_scope: external-bounded
+
+  - operation: geography.compare_candidate
+    implementation: stub
+    service_capability: geography.compare_candidate
+    effect_scope: none
+
+  - operation: geography.request_promotion
+    implementation: stub
+    service_capability: geography.request_promotion
+    effect_scope: orchestrator-state
+
+  - operation: geography.promote
+    implementation: stub
+    service_capability: geography.promote
+    effect_scope: external-bounded
+
+  - operation: geography.compile_publication
+    implementation: stub
+    service_capability: geography.compile_publication
+    effect_scope: external-bounded
+
+  - operation: participant.validate_publication
+    implementation: stub
+    service_capability: participant.validate_publication
+    effect_scope: none
+
+  - operation: repository.fetch_exact
+    implementation: stub
+    service_capability: repository.fetch_exact
+    effect_scope: none
+
+  - operation: rag.retrieve
+    implementation: stub
+    service_capability: rag.retrieve
+    effect_scope: none
+
+  - operation: inference.generate
+    implementation: stub
+    service_capability: inference.generate
+    effect_scope: none
+
+  - operation: edge.observe
+    implementation: stub
+    service_capability: edge.observe
+    effect_scope: none
+
+  - operation: edge.request_sync
+    implementation: stub
+    service_capability: edge.request_sync
+    effect_scope: external-bounded
+
+  - operation: firmware.prepare_release
+    implementation: stub
+    service_capability: firmware.prepare_release
+    effect_scope: orchestrator-state
+
+  - operation: signing.request_signature
+    implementation: stub
+    service_capability: signing.request_signature
+    effect_scope: external-bounded
+
+  - operation: audit.get_workflow
+    implementation: stub
+    service_capability: audit.get_workflow
+    effect_scope: none
+
+  - operation: incident.report
+    implementation: stub
+    service_capability: incident.report
+    effect_scope: orchestrator-state
+
+  - operation: incident.get
+    implementation: stub
+    service_capability: incident.get
+    effect_scope: none
+
+  - operation: incident.acknowledge
+    implementation: stub
+    service_capability: incident.acknowledge
+    effect_scope: orchestrator-state
+
+  - operation: incident.resolve
+    implementation: stub
+    service_capability: incident.resolve
+    effect_scope: orchestrator-state
+
+prohibited_generic_operations:
+  - shell.exec
+  - ssh.run
+  - sqlite.execute
+  - git.command
+  - kubo.rpc
+  - http.proxy
+  - signing.sign_arbitrary
+  - inference.tool_execute_arbitrary

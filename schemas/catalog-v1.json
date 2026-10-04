@@ -1,0 +1,106 @@
+{
+  "catalog_version": 1,
+  "description": "Public mapping from Civic schema URNs to repository-relative schema files.",
+  "schemas": [
+    {
+      "id": "urn:civic-orchestrator:schema:common:v1",
+      "path": "common-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:caller-identity:v1",
+      "path": "caller-identity-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:client-identity:v1",
+      "path": "client-identity-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:request-envelope:v1",
+      "path": "request-envelope-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:result-envelope:v1",
+      "path": "result-envelope-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:failure-envelope:v1",
+      "path": "failure-envelope-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:operation-descriptor:v1",
+      "path": "operation-descriptor-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:operation-registry:v1",
+      "path": "operation-registry-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:custom-command-registry:v1",
+      "path": "custom-command-registry-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:custom-command-help:v1",
+      "path": "custom-command-help-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:custom-command-access:v1",
+      "path": "custom-command-access-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:authorization-decision:v1",
+      "path": "authorization-decision-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:workflow:v1",
+      "path": "workflow-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:audit-event:v1",
+      "path": "audit-event-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:receipt:v1",
+      "path": "receipt-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:service-capability:v1",
+      "path": "service-capability-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:workflow-evidence:v1",
+      "path": "workflow-evidence-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:incident:v1",
+      "path": "incident-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:stub-workflow-definition:v1",
+      "path": "stub-workflow-definition-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:publication-artifact:v1",
+      "path": "publication-artifact-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:publication-publish-input:v1",
+      "path": "publication-publish-input-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:publication-service-request:v1",
+      "path": "publication-service-request-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:publication-service-result:v1",
+      "path": "publication-service-result-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:publication-service-failure:v1",
+      "path": "publication-service-failure-v1.schema.json"
+    },
+    {
+      "id": "urn:civic-orchestrator:schema:publication-workflow-definition:v1",
+      "path": "publication-workflow-definition-v1.schema.json"
+    }
+  ]
+}

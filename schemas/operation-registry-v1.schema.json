@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:operation-registry:v1",
+  "title": "Civic Operation Registry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "registry",
+    "default_implementation",
+    "default_side_effects",
+    "operations",
+    "prohibited_generic_operations"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "registry": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "default_implementation": {
+      "type": "string",
+      "enum": [
+        "stub",
+        "available",
+        "unavailable",
+        "disabled"
+      ]
+    },
+    "default_side_effects": {
+      "const": false
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "urn:civic-orchestrator:schema:operation-descriptor:v1"
+      }
+    },
+    "prohibited_generic_operations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "uniqueItems": true
+    }
+  }
+}

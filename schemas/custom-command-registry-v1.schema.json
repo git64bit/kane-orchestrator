@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:custom-command-registry:v1",
+  "title": "Civic Custom Command Registry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "registry",
+    "identifier",
+    "default_lifecycle",
+    "default_side_effects",
+    "commands",
+    "prohibited_generic_behaviors"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "registry": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "identifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scheme",
+        "pattern",
+        "serialized"
+      ],
+      "properties": {
+        "scheme": {
+          "const": "two-token-codename"
+        },
+        "pattern": {
+          "const": "^[a-z]{1,5}-[a-z]{1,5}$"
+        },
+        "serialized": {
+          "const": false
+        }
+      }
+    },
+    "default_lifecycle": {
+      "type": "string",
+      "enum": [
+        "declared",
+        "stub",
+        "validation",
+        "available",
+        "disabled",
+        "retired"
+      ]
+    },
+    "default_side_effects": {
+      "const": false
+    },
+    "commands": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codename",
+          "display_name",
+          "family",
+          "audience",
+          "authority_profile",
+          "lifecycle",
+          "side_effects_enabled",
+          "intended_effect_scope",
+          "binding",
+          "input_profile",
+          "object_classes",
+          "resource_classes",
+          "result_evidence"
+        ],
+        "properties": {
+          "codename": {
+            "type": "string",
+            "pattern": "^[a-z]{1,5}-[a-z]{1,5}$"
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "family": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          },
+          "audience": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,63}$"
+            }
+          },
+          "authority_profile": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$"
+          },
+          "lifecycle": {
+            "type": "string",
+            "enum": [
+              "declared",
+              "stub",
+              "validation",
+              "available",
+              "disabled",
+              "retired"
+            ]
+          },
+          "side_effects_enabled": {
+            "type": "boolean"
+          },
+          "intended_effect_scope": {
+            "type": "string",
+            "enum": [
+              "none",
+              "orchestrator-state",
+              "external-bounded"
+            ]
+          },
+          "binding": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "bound",
+                  "pending"
+                ]
+              },
+              "operation": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "bound"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "operation"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "pending"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                },
+                "then": {
+                  "not": {
+                    "required": [
+                      "operation"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "input_profile": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mode",
+              "byte_payload"
+            ],
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "upload-bytes",
+                  "select-known-object",
+                  "typed-fields",
+                  "mixed"
+                ]
+              },
+              "byte_payload": {
+                "type": "boolean"
+              },
+              "schema": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 240
+              }
+            }
+          },
+          "object_classes": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "accepts",
+              "creates"
+            ],
+            "properties": {
+              "accepts": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                }
+              },
+              "creates": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                }
+              }
+            }
+          },
+          "resource_classes": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          },
+          "result_evidence": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          }
+        }
+      }
+    },
+    "prohibited_generic_behaviors": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      }
+    }
+  }
+}

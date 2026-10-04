@@ -1,0 +1,381 @@
+contract_version: 1
+catalog: civic-custom-command-help
+help_system:
+  version: 1
+  style: plain-language
+  local_rendering: true
+  authorization_effect: none
+  participant_goal: discovery-and-sanity-check
+
+commands:
+  - codename: water-ants
+    display_name: "Publish File"
+    summary: "Publish exact file bytes as a participant-linked Civic publication."
+    use_when:
+      - "You intentionally want an inspectable PDF, text file, or supported image to become a durable Civic publication."
+    before_run:
+      - "Open and review the file yourself before selecting it."
+      - "Do not use publication as a private backup or merely to free space in your home directory."
+    significant_effects:
+      - "When production publication is enabled, the exact accepted bytes are published and linked to your participant history."
+      - "Publication is designed for durable public verification; later unpinning cannot guarantee that every copy disappears."
+    consequences:
+      - "Do not publish secrets, private material, or anything you expect to retract later."
+      - "The source filename does not create a Logical File Namespace name."
+    incident_guidance:
+      - "If a result is rejected or uncertain, do not retry blindly; inspect workflow or receipt evidence first."
+      - "A local error or timeout does not by itself prove that publication occurred."
+    attention: high
+    confirmation: explicit
+  - codename: navy-roots
+    display_name: "My Publications"
+    summary: "Show the publications recorded for your participant identity."
+    use_when:
+      - "You need to find a prior publication before organizing, verifying, pinning, or referencing it."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "The list is a Civic catalog view, not a claim that every IPFS replica is currently reachable."
+    incident_guidance:
+      - "If an expected publication is missing, inspect the prior workflow or receipt before republishing."
+    attention: normal
+    confirmation: none
+  - codename: next-penny
+    display_name: "Bind Logical File Name"
+    summary: "Attach a participant-scoped Logical File Namespace path to an existing publication."
+    use_when:
+      - "You want a human-meaningful path for a publication already in your Civic catalog."
+    before_run:
+      - "Confirm the selected publication is the one you intend to name."
+      - "Check the path spelling; the namespace is logical, not your /home filesystem."
+    significant_effects:
+      - "Creates authoritative participant metadata associating the logical path with a publication."
+    consequences:
+      - "The path does not move or rename a physical file and does not change the CID."
+    incident_guidance:
+      - "A collision must fail closed; do not expect silent replacement of an existing binding."
+    attention: caution
+    confirmation: review
+  - codename: amber-crow
+    display_name: "Browse Logical File Namespace"
+    summary: "Browse your participant-scoped Logical File Namespace."
+    use_when:
+      - "You need to find participant-organized publications by logical path."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "Displayed hierarchy is catalog organization, not a physical filesystem tree."
+    incident_guidance:
+      - "If a path is missing, verify binding history before creating another path."
+    attention: normal
+    confirmation: none
+  - codename: quiet-moss
+    display_name: "Rebind Logical File Name"
+    summary: "Explicitly replace which known publication a logical path refers to while preserving history."
+    use_when:
+      - "A logical name should intentionally point to a newer or different existing publication."
+    before_run:
+      - "Verify both the current binding and the replacement publication."
+    significant_effects:
+      - "Changes authoritative participant namespace metadata while preserving prior binding history."
+    consequences:
+      - "Rebinding does not delete, unpublish, or unpin the former publication."
+    incident_guidance:
+      - "If the replacement is uncertain, inspect both publications rather than guessing from filenames."
+    attention: high
+    confirmation: explicit
+  - codename: stone-wren
+    display_name: "Unbind Logical File Name"
+    summary: "Remove a logical-path binding from your participant namespace."
+    use_when:
+      - "You no longer want a logical name to point to a publication."
+    before_run:
+      - "Verify the path; unbinding is not the same as deleting publication bytes."
+    significant_effects:
+      - "Removes the active namespace binding while retaining historical evidence."
+    consequences:
+      - "The publication and CID remain separate Civic facts and may remain available."
+    incident_guidance:
+      - "If you intended to change pin state, use the pinning command rather than unbinding."
+    attention: high
+    confirmation: explicit
+  - codename: coral-fern
+    display_name: "Request Pin"
+    summary: "Request that an authorized Civic pinning resource retain a replica of one of your publications."
+    use_when:
+      - "You want additional Civic-controlled retention for a known publication."
+    before_run:
+      - "Verify the publication identity and the pinning resource or policy shown by the interface."
+    significant_effects:
+      - "May consume participant pinning or storage budget on a separate pinning service."
+    consequences:
+      - "Pinning improves intended retention but does not make the pinning node the publication authority."
+    incident_guidance:
+      - "Treat desired and observed pin state separately; a request receipt is not proof pinning completed."
+    attention: caution
+    confirmation: review
+  - codename: ivory-moth
+    display_name: "Request Unpin"
+    summary: "Request removal of a participant-controlled Civic pin for a known publication."
+    use_when:
+      - "You intentionally want a Civic pinning resource to stop retaining that replica."
+    before_run:
+      - "Check whether this is the last Civic-controlled replica you rely on."
+    significant_effects:
+      - "May reduce availability from Civic-controlled pinning resources."
+    consequences:
+      - "Unpinning is not deletion from IPFS and cannot guarantee removal of copies held elsewhere."
+    incident_guidance:
+      - "Confirm observed pin state after the request before assuming the replica is gone."
+    attention: high
+    confirmation: explicit
+  - codename: river-owls
+    display_name: "Inspect Pin State"
+    summary: "Inspect desired and observed pin state for a known publication."
+    use_when:
+      - "You need to know whether a pin or unpin request actually took effect."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "Observed state is resource-specific and is not a statement about every copy on IPFS."
+    incident_guidance:
+      - "A mismatch between desired and observed state is an operational condition; do not hide it with blind retries."
+    attention: normal
+    confirmation: none
+  - codename: cedar-lark
+    display_name: "My Attestation Timeline"
+    summary: "View your authenticated Attestation timeline."
+    use_when:
+      - "You need to inspect the ordered history of your Civic attestations and linked resources."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "The timeline preserves historical context; it is not a general file backup."
+    incident_guidance:
+      - "If chronology or a link appears wrong, preserve evidence and use correction or supersession semantics rather than rewriting history."
+    attention: normal
+    confirmation: none
+  - codename: plain-fox
+    display_name: "Register Attestation Record"
+    summary: "Submit a bounded Attestation Record for your Civic history."
+    use_when:
+      - "You intentionally want a supported event or resource reference to enter your authenticated attestation history."
+    before_run:
+      - "Review the exact record and referenced resource before submission."
+    significant_effects:
+      - "May create append-only authenticated history intended to remain verifiable later."
+    consequences:
+      - "Submission does not automatically make a third-party claim true or authoritative."
+    incident_guidance:
+      - "If submission status is uncertain, inspect history or receipt before submitting a second record."
+    attention: high
+    confirmation: explicit
+  - codename: flint-deer
+    display_name: "Verify Historical Resource"
+    summary: "Verify a historical resource against evidence retained in your Civic history."
+    use_when:
+      - "You need to check integrity, identity, signature, or historical linkage of a known resource."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "Verification can establish recorded or cryptographic consistency; it does not prove every statement in the resource."
+    incident_guidance:
+      - "A verification failure should be preserved as a diagnostic condition; do not overwrite the historical reference."
+    attention: normal
+    confirmation: none
+  - codename: maple-wasp
+    display_name: "My Attestation Device"
+    summary: "Show Attestation Device resources associated with your participant continuity."
+    use_when:
+      - "You need to inspect your current edge or Attestation Device relationship and status."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "A physical device is replaceable and is not your Civic identity."
+    incident_guidance:
+      - "If a device is missing or unreachable, do not create a new Civic identity; use replacement or reprovisioning workflow when available."
+    attention: normal
+    confirmation: none
+  - codename: cloud-reed
+    display_name: "Synchronize Attestation State"
+    summary: "Synchronize authenticated attestation state to an authorized Attestation Device."
+    use_when:
+      - "You want the edge device to refresh historical state it can resolve and verify."
+    before_run:
+      - "Confirm the target is your authorized edge resource and the device is healthy."
+    significant_effects:
+      - "Changes state on an external participant-controlled edge resource."
+    consequences:
+      - "Synchronization does not turn the edge into bulk storage or Civic authority."
+    incident_guidance:
+      - "If interrupted, inspect device and workflow state before retrying; partial delivery must not be assumed complete."
+    attention: caution
+    confirmation: review
+  - codename: birch-kite
+    display_name: "Continuity Check"
+    summary: "Check whether historical continuity dependencies remain resolvable."
+    use_when:
+      - "You want a sanity check of references, verification material, and known edge continuity."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "A successful check is a point-in-time observation, not a permanent availability guarantee."
+    incident_guidance:
+      - "Missing dependencies should be reported individually rather than hidden behind one overall pass or fail."
+    attention: normal
+    confirmation: none
+  - codename: green-lamb
+    display_name: "Resolve Historical Resource"
+    summary: "Resolve a known historical Civic resource using available locators and verification evidence."
+    use_when:
+      - "You need to find a historical resource after topology, operator, or jurisdiction changes."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "A locator is not itself proof of authenticity."
+    incident_guidance:
+      - "If one locator fails, preserve resource identity and try other authorized or public resolution paths rather than changing the identity."
+    attention: normal
+    confirmation: none
+  - codename: silk-heron
+    display_name: "Register Witness Image Evidence"
+    summary: "Register a Witness image reference as evidence in your Civic history."
+    use_when:
+      - "A Witness or Hubzilla image and its context should be linked into your attestation history."
+    before_run:
+      - "Confirm the image and post or channel context are the intended evidence."
+    significant_effects:
+      - "Creates historical linkage between Witness evidence and attestation history."
+    consequences:
+      - "The reference does not copy Hubzilla itself and does not make the edge device an image store."
+    incident_guidance:
+      - "If a locator changes, preserve historical resource identity and add alternate continuity information rather than replacing history."
+    attention: caution
+    confirmation: review
+  - codename: crown-ruby
+    display_name: "Inspect Nomadic Continuity"
+    summary: "Inspect continuity information relevant to your Hubzilla Nomadic Identity."
+    use_when:
+      - "You are checking whether your Witness identity can continue on another compatible hub or operator."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "This command does not clone or migrate the account; Hubzilla remains the authority for nomadic cloning."
+    incident_guidance:
+      - "If clone state is incomplete, use Hubzilla-supported recovery or clone mechanisms rather than moving private identity material through Custom Commands."
+    attention: normal
+    confirmation: none
+  - codename: olive-mint
+    display_name: "Publish Public Verification Material"
+    summary: "Publish allowed public verification material such as a public key or certificate artifact."
+    use_when:
+      - "Others or a future Attestation Device need public material to verify historical signatures or identities."
+    before_run:
+      - "Confirm the material is public-only and contains no private key, secret, password, or recovery seed."
+    significant_effects:
+      - "May create a durable public publication of verification material."
+    consequences:
+      - "Publishing a public key does not authorize that key to sign on behalf of a Civic authority."
+    incident_guidance:
+      - "If private material may have been included, treat it as a key-compromise incident; deletion or unpinning is not adequate remediation."
+    attention: high
+    confirmation: explicit
+  - codename: dawn-cedar
+    display_name: "Inspect Public-Key and Signature History"
+    summary: "Inspect public-key and signature history linked to your Civic records."
+    use_when:
+      - "You need to understand which verification material applies to historical records."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "Historical key validity and current authority are separate questions."
+    incident_guidance:
+      - "Do not infer current authority merely because an old signature still verifies cryptographically."
+    attention: normal
+    confirmation: none
+  - codename: pearl-moss
+    display_name: "Place Public Verification Material on Edge"
+    summary: "Place public verification material on an authorized Attestation Device."
+    use_when:
+      - "The edge should retain verification context needed for offline or future historical checks."
+    before_run:
+      - "Verify the material is public and the target edge is authorized."
+    significant_effects:
+      - "Changes verification state on an external edge resource."
+    consequences:
+      - "Placement does not authorize the key and does not transfer private-key custody."
+    incident_guidance:
+      - "If placement status is uncertain, inspect edge inventory before repeating the request."
+    attention: caution
+    confirmation: review
+  - codename: metal-robin
+    display_name: "Request Authorized Signature"
+    summary: "Request a specifically authorized Civic signature operation."
+    use_when:
+      - "A defined Civic workflow requires a signature from an authority permitted to sign that exact object class."
+    before_run:
+      - "Verify the object, authority context, and purpose shown by the interface; never supply a private key."
+    significant_effects:
+      - "May create durable signed evidence whose meaning depends on accepted authority context."
+    consequences:
+      - "A valid signature can have lasting evidentiary significance; arbitrary signing is prohibited."
+    incident_guidance:
+      - "If signed bytes, signer identity, or authority context are unexpected, stop and preserve receipt evidence for review."
+    attention: high
+    confirmation: explicit
+  - codename: lilac-shore
+    display_name: "Show Authorized Firmware"
+    summary: "Show firmware releases authorized for your edge device class."
+    use_when:
+      - "You need to see which firmware can legitimately be installed."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "Being listed as authorized does not install firmware."
+    incident_guidance:
+      - "If expected firmware is absent, do not bypass release authorization with direct flashing through Civic commands."
+    attention: normal
+    confirmation: none
+  - codename: rust-moon
+    display_name: "Request Authorized Edge Update"
+    summary: "Request installation or trial of an authorized firmware release on an authorized edge resource."
+    use_when:
+      - "You intentionally want your Attestation Device to move to a specific authorized firmware release."
+    before_run:
+      - "Verify device class, release identity, rollback or recovery compatibility, and current device health."
+    significant_effects:
+      - "May reboot or temporarily change availability of the edge device and start a trial or rollback workflow."
+    consequences:
+      - "A failed update can interrupt edge service; firmware authority and transport availability are separate controls."
+    incident_guidance:
+      - "Do not repeatedly force updates after a failed trial; inspect rollback and health state first."
+    attention: high
+    confirmation: explicit
+  - codename: north-bell
+    display_name: "Inspect Update and Rollback State"
+    summary: "Inspect firmware trial, health, and rollback state for an edge device."
+    use_when:
+      - "You need to know whether an update succeeded, is still in trial, or rolled back."
+    before_run: []
+    significant_effects: []
+    consequences:
+      - "This is an observation command and does not itself confirm health or authorize a release."
+    incident_guidance:
+      - "Unexpected rollback or repeated trial failure should be preserved as an incident or diagnostic condition."
+    attention: normal
+    confirmation: none
+  - codename: final-wave
+    display_name: "Pre-Departure Continuity Audit"
+    summary: "Run a pre-departure continuity audit while current Civic participation is still active."
+    use_when:
+      - "You expect to leave the jurisdiction or operator and want to verify historical continuity."
+    before_run:
+      - "Forward email you want to keep to your own main account and complete supported Hubzilla cloning separately."
+    significant_effects:
+      - "The audit itself is read-only; follow-up actions may use other commands with their own warnings."
+    consequences:
+      - "Passing the audit does not preserve Portal or Witness authorization after departure; it checks continuity of already-authenticated history."
+    incident_guidance:
+      - "Resolve missing resources or verification dependencies before departure where practical; do not assume a final login will always be available later."
+    attention: caution
+    confirmation: review

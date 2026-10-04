@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:result-envelope:v1",
+  "title": "Civic Orchestrator Result Envelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "request_id",
+    "workflow_id",
+    "operation",
+    "status",
+    "completed_at",
+    "side_effects",
+    "result"
+  ],
+  "properties": {
+    "contract_version": { "const": 1 },
+    "request_id": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id" },
+    "workflow_id": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id" },
+    "operation": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/operation" },
+    "status": {
+      "type": "string",
+      "enum": ["accepted", "completed", "rejected", "failed", "not-implemented"]
+    },
+    "completed_at": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/timestamp" },
+    "side_effects": {
+      "type": "boolean"
+    },
+    "result": {
+      "type": "object"
+    },
+    "receipt_id": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id" }
+  }
+}

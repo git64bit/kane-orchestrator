@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:caller-identity:v1",
+  "title": "Civic Caller Identity v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "subject",
+    "authenticated_by"
+  ],
+  "properties": {
+    "subject": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    },
+    "authority": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    },
+    "authenticated_by": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    }
+  }
+}

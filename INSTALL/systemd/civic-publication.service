@@ -1,0 +1,34 @@
+# Template for a publication host. The publication installer replaces every
+# @NAME@ placeholder. The service defaults to loopback; exposure beyond the
+# host is a deliberate deployment decision.
+[Unit]
+Description=Civic Publication Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=civic-publication
+Group=civic-publication
+LoadCredential=publication-service.json:/etc/civic-publication/credentials/publication-service.json
+ExecStart=/usr/bin/python3 /opt/civic-publication/publication_service.py \
+  --listen @PUBLICATION_LISTEN@ \
+  --port 8046 \
+  --credential-name publication-service.json
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_INET6
+ReadWritePaths=/var/lib/civic-publication /var/log/civic-publication
+
+[Install]
+WantedBy=multi-user.target

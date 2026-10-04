@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:publication-service-request:v1",
+  "title": "Publication Service Request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "workflow_id",
+    "operation",
+    "artifact"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "workflow_id": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    },
+    "operation": {
+      "const": "publication.publish"
+    },
+    "artifact": {
+      "$ref": "urn:civic-orchestrator:schema:publication-artifact:v1"
+    }
+  }
+}

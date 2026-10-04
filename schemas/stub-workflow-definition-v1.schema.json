@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:stub-workflow-definition:v1",
+  "title": "Stub Workflow Definition v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workflow",
+    "version",
+    "purpose",
+    "authorization_policy",
+    "accepted_namespaces",
+    "steps",
+    "constraints"
+  ],
+  "properties": {
+    "workflow": {
+      "const": "stub-operation"
+    },
+    "version": {
+      "const": 1
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authorization_policy": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    },
+    "accepted_namespaces": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_-]*$"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "minProperties": 1,
+        "maxProperties": 1,
+        "additionalProperties": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "side_effects",
+        "arbitrary_command_execution",
+        "backend_network_calls",
+        "filesystem_mutation_outside_orchestrator_state"
+      ],
+      "properties": {
+        "side_effects": {
+          "const": false
+        },
+        "arbitrary_command_execution": {
+          "const": false
+        },
+        "backend_network_calls": {
+          "const": false
+        },
+        "filesystem_mutation_outside_orchestrator_state": {
+          "const": false
+        }
+      }
+    }
+  }
+}

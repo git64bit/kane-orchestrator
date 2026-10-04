@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:workflow-evidence:v1",
+  "title": "Civic Workflow Evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "workflow",
+    "authorization_decisions",
+    "audit_events",
+    "receipts",
+    "side_effects"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workflow_id",
+        "request_id",
+        "operation",
+        "state",
+        "created_at",
+        "updated_at",
+        "side_effects"
+      ],
+      "properties": {
+        "workflow_id": {
+          "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+        },
+        "request_id": {
+          "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+        },
+        "operation": {
+          "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/operation"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "received",
+            "validated",
+            "authorized",
+            "accepted",
+            "waiting",
+            "completed",
+            "rejected",
+            "failed",
+            "not-implemented"
+          ]
+        },
+        "created_at": {
+          "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/timestamp"
+        },
+        "updated_at": {
+          "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/timestamp"
+        },
+        "side_effects": {
+          "type": "boolean"
+        },
+        "side_effects_certainty": {
+          "type": "string",
+          "enum": [
+            "known",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "authorization_decisions": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:civic-orchestrator:schema:authorization-decision:v1"
+      }
+    },
+    "audit_events": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:civic-orchestrator:schema:audit-event:v1"
+      }
+    },
+    "receipts": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:civic-orchestrator:schema:receipt:v1"
+      }
+    },
+    "side_effects": {
+      "type": "boolean"
+    },
+    "side_effects_certainty": {
+      "type": "string",
+      "enum": [
+        "known",
+        "unknown"
+      ]
+    }
+  }
+}

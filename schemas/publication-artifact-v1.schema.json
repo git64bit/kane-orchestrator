@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:publication-artifact:v1",
+  "title": "Publication Artifact v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "media_type",
+    "size_bytes",
+    "sha256",
+    "encoding",
+    "content"
+  ],
+  "properties": {
+    "media_type": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9!#$&^_.+\\-]+/[A-Za-z0-9!#$&^_.+\\-]+$"
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 262144
+    },
+    "sha256": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/sha256"
+    },
+    "encoding": {
+      "const": "base64"
+    },
+    "content": {
+      "type": "string",
+      "contentEncoding": "base64",
+      "maxLength": 1398104,
+      "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+    }
+  }
+}

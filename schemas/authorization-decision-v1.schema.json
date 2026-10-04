@@ -1,0 +1,17 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"urn:civic-orchestrator:schema:authorization-decision:v1",
+  "title":"Civic Authorization Decision v1",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["decision_id","request_id","operation","decision","decided_at","policy"],
+  "properties":{
+    "decision_id":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/id"},
+    "request_id":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/id"},
+    "operation":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/operation"},
+    "decision":{"type":"string","enum":["allow","deny","defer"]},
+    "decided_at":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/timestamp"},
+    "policy":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/id"},
+    "reason":{"type":"string","maxLength":1000}
+  }
+}

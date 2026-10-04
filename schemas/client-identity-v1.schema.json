@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:client-identity:v1",
+  "title": "Civic Client Identity v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "kind"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    },
+    "kind": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/client_kind"
+    }
+  }
+}

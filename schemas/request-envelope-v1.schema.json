@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:request-envelope:v1",
+  "title": "Civic Orchestrator Request Envelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "request_id",
+    "operation",
+    "caller",
+    "client",
+    "submitted_at",
+    "input"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 1
+    },
+    "request_id": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    },
+    "operation": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/operation"
+    },
+    "caller": {
+      "$ref": "urn:civic-orchestrator:schema:caller-identity:v1"
+    },
+    "client": {
+      "$ref": "urn:civic-orchestrator:schema:client-identity:v1"
+    },
+    "submitted_at": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/timestamp"
+    },
+    "idempotency_key": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    },
+    "input": {
+      "type": "object"
+    }
+  }
+}

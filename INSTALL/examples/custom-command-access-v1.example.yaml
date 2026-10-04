@@ -1,0 +1,43 @@
+contract_version: 1
+policy: civic-custom-command-access
+
+defaults:
+  discover: false
+  invoke: false
+
+qualification_semantics:
+  descriptive_only: true
+  automatic_grants: false
+
+participants:
+  - participant_id: participant:550e8400-e29b-41d4-a716-446655440000
+    active: true
+    qualifications:
+      - name: current-resident
+        status: current
+        recorded_by: operator:example
+        recorded_at: "2026-10-03T18:00:00Z"
+        note: "Example only; qualification is human-curated context."
+      - name: unit-owner
+        status: current
+        recorded_by: operator:example
+        recorded_at: "2026-10-03T18:00:00Z"
+        note: null
+    command_access:
+      - codename: water-ants
+        discover: true
+        invoke: true
+        granted_by: operator:example
+        granted_at: "2026-10-03T18:05:00Z"
+        expires_at: null
+        reason: "Participant was explicitly admitted to bounded publication."
+
+  - participant_id: participant:11111111-2222-3333-4444-555555555555
+    active: true
+    qualifications:
+      - name: current-resident
+        status: current
+        recorded_by: operator:example
+        recorded_at: "2026-10-03T18:00:00Z"
+        note: null
+    command_access: []

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:incident:v1",
+  "title": "Civic Operational Incident v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "incident_id",
+    "domain",
+    "severity",
+    "visibility",
+    "source",
+    "state",
+    "summary",
+    "opened_at",
+    "updated_at"
+  ],
+  "properties": {
+    "contract_version": { "const": 1 },
+    "incident_id": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id" },
+    "source_signal_id": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id" },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "core",
+        "transport",
+        "publication",
+        "repository",
+        "geography",
+        "rag",
+        "inference",
+        "signing",
+        "edge",
+        "participant",
+        "security"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "warning", "degraded", "failure", "critical"]
+    },
+    "visibility": {
+      "type": "string",
+      "enum": ["local", "operator", "participant", "public"]
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["open", "acknowledged", "resolved"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "context": {
+      "type": "object"
+    },
+    "opened_at": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/timestamp" },
+    "updated_at": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/timestamp" },
+    "resolved_at": { "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/timestamp" }
+  }
+}

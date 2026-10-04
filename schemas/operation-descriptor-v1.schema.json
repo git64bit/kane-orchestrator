@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:operation-descriptor:v1",
+  "title": "Civic Operation Descriptor v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "operation",
+    "implementation",
+    "effect_scope",
+    "service_capability"
+  ],
+  "properties": {
+    "operation": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/operation"
+    },
+    "implementation": {
+      "type": "string",
+      "enum": [
+        "stub",
+        "available",
+        "unavailable",
+        "disabled"
+      ]
+    },
+    "effect_scope": {
+      "type": "string",
+      "enum": [
+        "none",
+        "orchestrator-state",
+        "external-bounded"
+      ]
+    },
+    "requires_authorization": {
+      "type": "boolean",
+      "default": true
+    },
+    "service_capability": {
+      "$ref": "urn:civic-orchestrator:schema:common:v1#/$defs/id"
+    }
+  }
+}

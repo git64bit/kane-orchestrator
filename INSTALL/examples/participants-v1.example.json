@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "participants": [
+    {
+      "username": "participant-example",
+      "uid": 1002,
+      "participant_id": "participant:550e8400-e29b-41d4-a716-446655440000",
+      "active": true
+    },
+    {
+      "username": "retired-account-example",
+      "uid": 1099,
+      "participant_id": "participant:11111111-2222-3333-4444-555555555555",
+      "active": false
+    }
+  ]
+}

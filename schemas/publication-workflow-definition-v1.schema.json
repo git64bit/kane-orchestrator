@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:civic-orchestrator:schema:publication-workflow-definition:v1",
+  "title": "Publication Workflow Definition v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workflow",
+    "version",
+    "operation",
+    "authorization_policy",
+    "authorization_reason",
+    "service_capability",
+    "steps",
+    "constraints"
+  ],
+  "properties": {
+    "workflow": {
+      "const": "publication-publish"
+    },
+    "version": {
+      "const": 1
+    },
+    "operation": {
+      "const": "publication.publish"
+    },
+    "authorization_policy": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "authorization_reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "service_capability": {
+      "const": "publication.publish"
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exact_artifact",
+        "arbitrary_command_execution",
+        "backend_network_calls",
+        "kubo_side_effects_enabled"
+      ],
+      "properties": {
+        "exact_artifact": { "const": true },
+        "arbitrary_command_execution": { "const": false },
+        "backend_network_calls": { "const": true },
+        "kubo_side_effects_enabled": { "const": false }
+      }
+    }
+  }
+}

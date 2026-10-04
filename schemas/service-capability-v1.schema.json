@@ -1,0 +1,16 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"urn:civic-orchestrator:schema:service-capability:v1",
+  "title":"Civic Service Capability Advertisement v1",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["service_id","capability","status","contract_version"],
+  "properties":{
+    "service_id":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/id"},
+    "capability":{"$ref":"urn:civic-orchestrator:schema:common:v1#/$defs/operation"},
+    "status":{"type":"string","enum":["stub","available","unavailable","disabled"]},
+    "contract_version":{"type":"integer","minimum":1},
+    "endpoint_class":{"type":"string","enum":["local","service-network","protected","external"]},
+    "implementation":{"type":"string","maxLength":200}
+  }
+}

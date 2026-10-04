@@ -1,0 +1,522 @@
+contract_version: 1
+registry: civic-usermin-custom-commands
+identifier:
+  scheme: two-token-codename
+  pattern: '^[a-z]{1,5}-[a-z]{1,5}$'
+  serialized: false
+default_lifecycle: declared
+default_side_effects: false
+
+commands:
+  - codename: water-ants
+    display_name: "Publish File"
+    family: publication
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: stub
+    side_effects_enabled: false
+    intended_effect_scope: external-bounded
+    binding:
+      status: bound
+      operation: publication.publish
+    input_profile:
+      mode: upload-bytes
+      byte_payload: true
+      schema: null
+    object_classes:
+      accepts: ["working-file-bytes"]
+      creates: ["publication"]
+    resource_classes: ["participant.identity", "participant.working-storage", "publication.service", "publication.catalog", "publication.budget", "audit.store"]
+    result_evidence: ["authorization-decision", "workflow", "audit", "receipt", "publication-record"]
+  - codename: navy-roots
+    display_name: "My Publications"
+    family: publication
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: none
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: []
+      creates: []
+    resource_classes: ["participant.identity", "publication.catalog"]
+    result_evidence: ["catalog-result"]
+  - codename: next-penny
+    display_name: "Bind Logical File Name"
+    family: logical-file-namespace
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: orchestrator-state
+    binding:
+      status: pending
+    input_profile:
+      mode: typed-fields
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["publication"]
+      creates: ["logical-file-binding"]
+    resource_classes: ["participant.identity", "publication.catalog", "logical-file-namespace"]
+    result_evidence: ["audit", "receipt", "namespace-binding"]
+  - codename: amber-crow
+    display_name: "Browse Logical File Namespace"
+    family: logical-file-namespace
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: none
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: []
+      creates: []
+    resource_classes: ["participant.identity", "logical-file-namespace"]
+    result_evidence: ["namespace-result"]
+  - codename: quiet-moss
+    display_name: "Rebind Logical File Name"
+    family: logical-file-namespace
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: orchestrator-state
+    binding:
+      status: pending
+    input_profile:
+      mode: typed-fields
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["logical-file-binding", "publication"]
+      creates: ["logical-file-binding"]
+    resource_classes: ["participant.identity", "publication.catalog", "logical-file-namespace"]
+    result_evidence: ["audit", "receipt", "namespace-binding-history"]
+  - codename: stone-wren
+    display_name: "Unbind Logical File Name"
+    family: logical-file-namespace
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: orchestrator-state
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["logical-file-binding"]
+      creates: []
+    resource_classes: ["participant.identity", "logical-file-namespace"]
+    result_evidence: ["audit", "receipt", "namespace-binding-history"]
+  - codename: coral-fern
+    display_name: "Request Pin"
+    family: publication-retention
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: external-bounded
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["publication"]
+      creates: ["pin-request"]
+    resource_classes: ["participant.identity", "publication.catalog", "pinning.service", "pinning.budget"]
+    result_evidence: ["workflow", "audit", "receipt", "pin-state"]
+  - codename: ivory-moth
+    display_name: "Request Unpin"
+    family: publication-retention
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: external-bounded
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["publication"]
+      creates: ["unpin-request"]
+    resource_classes: ["participant.identity", "publication.catalog", "pinning.service"]
+    result_evidence: ["workflow", "audit", "receipt", "pin-state"]
+  - codename: river-owls
+    display_name: "Inspect Pin State"
+    family: publication-retention
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["publication"]
+      creates: []
+    resource_classes: ["participant.identity", "publication.catalog", "pinning.state"]
+    result_evidence: ["pin-state"]
+  - codename: cedar-lark
+    display_name: "My Attestation Timeline"
+    family: attestation
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: none
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: []
+      creates: []
+    resource_classes: ["participant.identity", "attestation.history"]
+    result_evidence: ["timeline-result"]
+  - codename: plain-fox
+    display_name: "Register Attestation Record"
+    family: attestation
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: orchestrator-state
+    binding:
+      status: pending
+    input_profile:
+      mode: mixed
+      byte_payload: true
+      schema: null
+    object_classes:
+      accepts: ["attestation-record"]
+      creates: ["attestation-history-entry"]
+    resource_classes: ["participant.identity", "attestation.history", "audit.store"]
+    result_evidence: ["verification-result", "audit", "receipt"]
+  - codename: flint-deer
+    display_name: "Verify Historical Resource"
+    family: attestation
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["civic-resource-reference"]
+      creates: []
+    resource_classes: ["participant.identity", "attestation.history", "verification.material"]
+    result_evidence: ["verification-result"]
+  - codename: maple-wasp
+    display_name: "My Attestation Device"
+    family: edge-continuity
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: none
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: []
+      creates: []
+    resource_classes: ["participant.identity", "edge.registry"]
+    result_evidence: ["edge-status"]
+  - codename: cloud-reed
+    display_name: "Synchronize Attestation State"
+    family: edge-continuity
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: external-bounded
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["attestation-state"]
+      creates: ["edge-sync-request"]
+    resource_classes: ["participant.identity", "attestation.history", "edge.registry", "edge.transport"]
+    result_evidence: ["workflow", "audit", "receipt", "edge-sync-state"]
+  - codename: birch-kite
+    display_name: "Continuity Check"
+    family: edge-continuity
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: none
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: []
+      creates: []
+    resource_classes: ["participant.identity", "attestation.history", "edge.registry", "resource.resolution"]
+    result_evidence: ["continuity-report"]
+  - codename: green-lamb
+    display_name: "Resolve Historical Resource"
+    family: edge-continuity
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["civic-resource-reference"]
+      creates: []
+    resource_classes: ["participant.identity", "resource.resolution"]
+    result_evidence: ["resolution-result", "verification-result"]
+  - codename: silk-heron
+    display_name: "Register Witness Image Evidence"
+    family: witness
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: orchestrator-state
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["witness-image-reference"]
+      creates: ["attestation-history-entry"]
+    resource_classes: ["participant.identity", "witness.reference", "attestation.history"]
+    result_evidence: ["audit", "receipt"]
+  - codename: crown-ruby
+    display_name: "Inspect Nomadic Continuity"
+    family: witness
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: none
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: []
+      creates: []
+    resource_classes: ["participant.identity", "witness.nomadic-state"]
+    result_evidence: ["continuity-report"]
+  - codename: olive-mint
+    display_name: "Publish Public Verification Material"
+    family: verification-material
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: external-bounded
+    binding:
+      status: pending
+    input_profile:
+      mode: upload-bytes
+      byte_payload: true
+      schema: null
+    object_classes:
+      accepts: ["public-verification-material"]
+      creates: ["publication"]
+    resource_classes: ["participant.identity", "publication.service", "publication.catalog", "verification.material"]
+    result_evidence: ["workflow", "audit", "receipt", "publication-record"]
+  - codename: dawn-cedar
+    display_name: "Inspect Public-Key and Signature History"
+    family: verification-material
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: none
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: []
+      creates: []
+    resource_classes: ["participant.identity", "verification.material", "attestation.history"]
+    result_evidence: ["verification-history"]
+  - codename: pearl-moss
+    display_name: "Place Public Verification Material on Edge"
+    family: verification-material
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: external-bounded
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["public-verification-material"]
+      creates: ["edge-placement"]
+    resource_classes: ["participant.identity", "verification.material", "edge.registry", "edge.transport"]
+    result_evidence: ["workflow", "audit", "receipt", "edge-placement-state"]
+  - codename: metal-robin
+    display_name: "Request Authorized Signature"
+    family: signing
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: external-bounded
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["signable-civic-object"]
+      creates: ["signed-civic-object"]
+    resource_classes: ["participant.identity", "signing.service", "authority.context"]
+    result_evidence: ["workflow", "audit", "receipt", "signature-evidence"]
+  - codename: lilac-shore
+    display_name: "Show Authorized Firmware"
+    family: firmware
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: none
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: []
+      creates: []
+    resource_classes: ["participant.identity", "firmware.catalog"]
+    result_evidence: ["firmware-release-list"]
+  - codename: rust-moon
+    display_name: "Request Authorized Edge Update"
+    family: firmware
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: external-bounded
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["authorized-firmware-release", "edge-resource"]
+      creates: ["edge-update-request"]
+    resource_classes: ["participant.identity", "firmware.catalog", "edge.registry", "edge.transport"]
+    result_evidence: ["workflow", "audit", "receipt", "edge-update-state"]
+  - codename: north-bell
+    display_name: "Inspect Update and Rollback State"
+    family: firmware
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: select-known-object
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: ["edge-resource"]
+      creates: []
+    resource_classes: ["participant.identity", "edge.registry", "firmware.state"]
+    result_evidence: ["edge-update-state"]
+  - codename: final-wave
+    display_name: "Pre-Departure Continuity Audit"
+    family: departure-continuity
+    audience: [participant]
+    authority_profile: authenticated-participant
+    lifecycle: declared
+    side_effects_enabled: false
+    intended_effect_scope: none
+    binding:
+      status: pending
+    input_profile:
+      mode: none
+      byte_payload: false
+      schema: null
+    object_classes:
+      accepts: []
+      creates: ["continuity-report"]
+    resource_classes: ["participant.identity", "publication.catalog", "logical-file-namespace", "attestation.history", "edge.registry", "verification.material", "witness.reference", "resource.resolution"]
+    result_evidence: ["continuity-report"]
+
+prohibited_generic_behaviors:
+  - shell.exec
+  - ssh.run
+  - http.proxy
+  - http.fetch_arbitrary
+  - sql.execute
+  - kubo.rpc
+  - signing.sign_arbitrary
+  - filesystem.open_privileged_path
+  - orchestrator.operation_select
+  - service.route_select
+  - credential.submit_private_key
+  - participant.cross_scope_mutation
+  - hubzilla.nomadic_reimplementation
+  - mail.storage_reimplementation
+  - ipfs.storage_reimplementation
